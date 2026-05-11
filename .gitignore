@@ -9,4 +9,5 @@
 /vendor/
 /.idea
 /.composer
+.bash_history
 ###< symfony/framework-bundle ###
