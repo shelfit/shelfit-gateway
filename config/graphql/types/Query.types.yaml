@@ -1,0 +1,9 @@
+Query:
+  type: object
+  config:
+    fields:
+      book:
+        type: "Book"
+        args:
+          id: "Int!"
+        resolve: '@=query("App\\GraphQL\\Resolver\\BookResolver::resolveBook", args)'

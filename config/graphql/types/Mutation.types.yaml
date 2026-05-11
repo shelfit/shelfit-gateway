@@ -1,0 +1,7 @@
+Mutation:
+  type: object
+  config:
+    fields:
+      _placeholder:
+        type: "Boolean"
+        resolve: "@=true"
