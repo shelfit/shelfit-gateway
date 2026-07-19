@@ -43,11 +43,11 @@ class IngestBookDataCommand
         try {
             foreach (array_chunk($data, self::CHUNK_SIZE) as $chunk) {
                 $sql = "
-                    INSERT INTO books (title, author, genres, page_count, cover_url, description, source, visibility)
+                    INSERT INTO books (title, author, genres, page_count, cover_url, description, source, visibility, rating, num_ratings)
                     VALUES " .
                     implode(
                         ", ",
-                        array_fill(0, count($chunk), "(?, ?, ?, ?, ?, ?, ?, ?)")
+                        array_fill(0, count($chunk), "(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)")
                     );
 
                 $params = [];
@@ -81,6 +81,8 @@ class IngestBookDataCommand
                     $params[] = $book['description'];
                     $params[] = BookSource::SOURCE_SYSTEM;
                     $params[] = BookVisibility::VISIBILITY_PUBLIC;
+                    $params[] = $book['rating'];
+                    $params[] = $book['numRatings'];
                 }
 
                 $conn->executeStatement($sql, $params);

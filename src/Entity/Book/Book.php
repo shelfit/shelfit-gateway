@@ -39,6 +39,12 @@ class Book
     #[ORM\Column(length: 255)]
     private ?string $visibility = null;
 
+    #[ORM\Column(nullable: true)]
+    private ?float $rating = null;
+
+    #[ORM\Column(nullable: true)]
+    private ?int $num_ratings = null;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -136,6 +142,30 @@ class Book
     public function setVisibility(string $visibility): static
     {
         $this->visibility = $visibility;
+
+        return $this;
+    }
+
+    public function getRating(): ?float
+    {
+        return $this->rating;
+    }
+
+    public function setRating(?float $rating): static
+    {
+        $this->rating = $rating;
+
+        return $this;
+    }
+
+    public function getNumRatings(): ?int
+    {
+        return $this->num_ratings;
+    }
+
+    public function setNumRatings(?int $num_ratings): static
+    {
+        $this->num_ratings = $num_ratings;
 
         return $this;
     }
