@@ -9,5 +9,7 @@ Book:
       pageCount: "String!"
       coverUrl: "String"
       description: "String"
+      rating: "Float"
+      num_ratings: "Int"
       source: "String!"
       visibility: "String!"

@@ -8,6 +8,11 @@ framework:
     #esi: true
     #fragments: true
 
+    http_client:
+      scoped_clients:
+        recommender.client:
+          base_uri: '%env(RECOMMENDER_BASE_URI)%'
+
 when@test:
     framework:
         test: true
