@@ -12,6 +12,8 @@ framework:
       scoped_clients:
         recommender.client:
           base_uri: '%env(RECOMMENDER_BASE_URI)%'
+        mailer.client:
+          base_uri: '%env(MAILER_BASE_URI)%'
 
 when@test:
     framework:

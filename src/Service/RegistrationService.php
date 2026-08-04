@@ -5,8 +5,10 @@ namespace App\Service;
 use App\DTO\UserDto;
 use App\Entity\AccountActivationToken;
 use App\Entity\User;
+use App\Message\SendEmailMessage;
 use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
+use Symfony\Component\Messenger\MessageBusInterface;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 
 readonly class RegistrationService
@@ -14,6 +16,9 @@ readonly class RegistrationService
     public function __construct(
         private UserPasswordHasherInterface $passwordHasher,
         private EntityManagerInterface $entityManager,
+        private MessageBusInterface $messageBus,
+        private EmailConfigProvider $emailConfigProvider,
+        private string $frontendBaseUri,
     ) {
     }
 
@@ -35,6 +40,18 @@ readonly class RegistrationService
         $this->entityManager->persist($user);
         $this->entityManager->persist($accountActivationToken);
         $this->entityManager->flush();
+
+        $config = $this->emailConfigProvider->getConfig();
+        $this->messageBus->dispatch(new SendEmailMessage(
+            idempotencyKey: bin2hex(random_bytes(16)),
+            subject: $config[EmailConfigProvider::ACCOUNT_ACTIVATION_EMAIL]['subject'],
+            from: $config[EmailConfigProvider::ACCOUNT_ACTIVATION_EMAIL]['sender'],
+            to: $user->getEmail(),
+            template: $config[EmailConfigProvider::ACCOUNT_ACTIVATION_EMAIL]['template'],
+            variables: [
+                'activation_url' => $this->frontendBaseUri . '/api/account/activate/' . $activationTokenPlain,
+            ]
+        ));
 
         return $user;
     }

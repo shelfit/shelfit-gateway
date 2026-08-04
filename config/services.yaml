@@ -11,3 +11,6 @@ services:
     App\:
         resource: '../src/'
 
+    App\Service\RegistrationService:
+      arguments:
+        $frontendBaseUri: '%env(FRONTEND_BASE_URI)%'
