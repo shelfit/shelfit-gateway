@@ -93,4 +93,9 @@ class AccountActivationToken
 
         return $this;
     }
+
+    public function isExpired(): bool
+    {
+        return $this->expiresAt <= new \DateTimeImmutable();
+    }
 }
