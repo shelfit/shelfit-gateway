@@ -12,24 +12,34 @@ security:
                 property: email
 
     firewalls:
-        dev:
-            # Ensure dev tools and static assets are always allowed
-            pattern: ^/(_profiler|_wdt|assets|build)/
-            security: false
-        main:
-            lazy: true
-            provider: app_user_provider
+      login:
+        pattern: ^/api/login
+        stateless: true
+        user_checker: App\Security\UserChecker
+        json_login:
+          check_path: /api/login
+          username_path: email
+          success_handler: lexik_jwt_authentication.handler.authentication_success
+          failure_handler: lexik_jwt_authentication.handler.authentication_failure
 
-            # Activate different ways to authenticate:
-            # https://symfony.com/doc/current/security.html#the-firewall
+      api:
+        pattern: ^/(api|graphql)
+        stateless: true
+        provider: app_user_provider
+        jwt: ~
 
-            # https://symfony.com/doc/current/security/impersonating_user.html
-            # switch_user: true
+      dev:
+        # Ensure dev tools and static assets are always allowed
+        pattern: ^/(_profiler|_wdt|assets|build)/
+        security: false
 
-    # Note: Only the *first* matching rule is applied
+      main:
+        lazy: true
+        provider: app_user_provider
+
     access_control:
-        # - { path: ^/admin, roles: ROLE_ADMIN }
-        # - { path: ^/profile, roles: ROLE_USER }
+        - { path: ^/api/login, roles: PUBLIC_ACCESS }
+        - { path: ^/api/register, roles: PUBLIC_ACCESS }
 
 when@test:
     security:
