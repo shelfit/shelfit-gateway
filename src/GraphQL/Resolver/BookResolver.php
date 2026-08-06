@@ -7,10 +7,10 @@ use App\Repository\BookRepository;
 use Overblog\GraphQLBundle\Definition\Argument;
 use Overblog\GraphQLBundle\Definition\Resolver\QueryInterface;
 
-class BookResolver implements QueryInterface
+readonly class BookResolver implements QueryInterface
 {
     public function __construct(
-        private readonly BookRepository $bookRepository,
+        private BookRepository $bookRepository,
     ) {}
 
     public function resolveBook(Argument $args): ?Book
