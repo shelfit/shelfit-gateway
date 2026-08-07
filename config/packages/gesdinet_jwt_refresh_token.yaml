@@ -1,0 +1,10 @@
+gesdinet_jwt_refresh_token:
+  refresh_token_class: App\Entity\RefreshToken
+  ttl: 2592000
+  single_use: true
+  max_tokens_per_user: 5
+  hash_tokens:
+    enabled: true
+  cookie:
+    enabled: true
+    secure: false # TODO: false only for local testing, change to true later

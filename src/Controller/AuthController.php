@@ -3,7 +3,6 @@
 namespace App\Controller;
 
 use App\Repository\AccountActivationTokenRepository;
-use App\Repository\UserRepository;
 use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;

@@ -12,6 +12,15 @@ security:
                 property: email
 
     firewalls:
+      refresh:
+        pattern: ^/api/(token/refresh|logout)
+        stateless: true
+        user_checker: App\Security\UserChecker
+        refresh_jwt:
+          check_path: /api/token/refresh
+        logout:
+          path: /api/logout
+
       login:
         pattern: ^/api/login
         stateless: true
@@ -39,7 +48,11 @@ security:
 
     access_control:
         - { path: ^/api/login, roles: PUBLIC_ACCESS }
+        - { path: ^/api/logout, roles: PUBLIC_ACCESS }
         - { path: ^/api/register, roles: PUBLIC_ACCESS }
+        - { path: ^/api/accounts/activate, roles: PUBLIC_ACCESS }
+        - { path: ^/api/token/refresh, roles: PUBLIC_ACCESS }
+        - { path: ^/api, roles: IS_AUTHENTICATED_FULLY }
 
 when@test:
     security:
