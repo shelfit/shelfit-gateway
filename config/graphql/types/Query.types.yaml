@@ -7,9 +7,11 @@ Query:
         args:
           id: "Int!"
         resolve: '@=query("App\\GraphQL\\Resolver\\BookResolver::resolveBook", args)'
-
       recommendBooks:
         type: "[Book]"
         args:
           query: "String"
         resolve: '@=query("App\\GraphQL\\Resolver\\RecommendationResolver::recommendBooks", args)'
+      me:
+        type: "User!"
+        resolve: '@=query("App\\GraphQL\\Resolver\\UserResolver::me", args)'
