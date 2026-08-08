@@ -28,7 +28,7 @@ readonly class RecommendationResolver implements QueryInterface
         try {
             self::getLoggedInUser($this->security);
         } catch (AuthenticationException) {
-            throw new UserError("not.authenticated");
+            throw new UserError(self::NOT_AUTHENTICATED);
         }
 
         try {

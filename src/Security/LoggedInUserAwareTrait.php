@@ -9,6 +9,8 @@ use Symfony\Component\Security\Core\Exception\AuthenticationException;
 
 trait LoggedInUserAwareTrait
 {
+    private const NOT_AUTHENTICATED = 'not.authenticated';
+
     public static function getLoggedInUser(Security $security): User
     {
         $user = $security->getUser();

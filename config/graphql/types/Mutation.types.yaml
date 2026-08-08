@@ -2,6 +2,13 @@ Mutation:
   type: object
   config:
     fields:
-      _placeholder:
-        type: "Boolean"
-        resolve: "@=true"
+      follow:
+        type: "Boolean!"
+        args:
+          followedUserId: "Int!"
+        resolve: '@=mutation("App\\GraphQL\\Mutation\\FollowMutation::follow", args)'
+      unfollow:
+        type: "Boolean!"
+        args:
+          unfollowedUserId: "Int!"
+        resolve: '@=mutation("App\\GraphQL\\Mutation\\FollowMutation::unfollow", args)'

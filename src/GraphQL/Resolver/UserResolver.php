@@ -25,7 +25,7 @@ readonly class UserResolver implements QueryInterface
         try {
             return self::getLoggedInUser($this->security);
         } catch (AuthenticationException) {
-            throw new UserError("not.authenticated");
+            throw new UserError(self::NOT_AUTHENTICATED);
         }
     }
 }

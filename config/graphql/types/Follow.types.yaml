@@ -1,0 +1,6 @@
+FollowList:
+  type: object
+  config:
+    fields:
+      users: "[User]!"
+      count: "Int!"

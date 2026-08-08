@@ -5,3 +5,15 @@ User:
       id: "Int!"
       email: "String!"
       username: "String!"
+      followers:
+        type: "FollowList!"
+        args:
+          limit: "Int"
+          offset: "Int"
+        resolve: '@=query("App\\GraphQL\\Resolver\\FollowResolver::followers", args, value)'
+      following:
+        type: "FollowList!"
+        args:
+          limit: "Int"
+          offset: "Int"
+        resolve: '@=query("App\\GraphQL\\Resolver\\FollowResolver::following", args, value)'
