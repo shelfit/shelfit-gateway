@@ -1,0 +1,30 @@
+ReadLog:
+  type: object
+  config:
+    fields:
+      id: "Int!"
+      book: "Book!"
+      user: "User!"
+      currentPage: "Int!"
+      rating: "Float"
+      review: "String"
+      status: "ReadLogStatusEnum!"
+      createdAt: "DateTimeImmutable!"
+      updatedAt: "DateTimeImmutable"
+      finishedAt: "DateTimeImmutable"
+
+ReadLogStatusEnum:
+  type: enum
+  config:
+    values:
+      READING: "reading"
+      FINISHED: "finished"
+      TBR: "tbr"
+      DNF: "dnf"
+
+CreateReadLogInput:
+  type: input-object
+  config:
+    fields:
+      currentPage: "Int"
+      status: "ReadLogStatusEnum!"

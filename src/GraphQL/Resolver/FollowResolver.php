@@ -4,18 +4,13 @@ namespace App\GraphQL\Resolver;
 
 use App\Entity\User;
 use App\Repository\FollowRepository;
-use App\Security\LoggedInUserAwareTrait;
 use Overblog\GraphQLBundle\Definition\Argument;
 use Overblog\GraphQLBundle\Definition\Resolver\QueryInterface;
-use Symfony\Bundle\SecurityBundle\Security;
 
 readonly class FollowResolver implements QueryInterface
 {
-    use LoggedInUserAwareTrait;
-
     public function __construct(
         private FollowRepository $followRepository,
-        private Security $security,
     ) {
     }
 

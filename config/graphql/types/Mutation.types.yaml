@@ -12,3 +12,15 @@ Mutation:
         args:
           unfollowedUserId: "Int!"
         resolve: '@=mutation("App\\GraphQL\\Mutation\\FollowMutation::unfollow", args)'
+      createReadLogFromExistingBook:
+        type: "ReadLog!"
+        args:
+          bookId: "Int!"
+          readLogInput: "CreateReadLogInput!"
+        resolve: '@=mutation("App\\GraphQL\\Mutation\\ReadLogMutation::createReadLogFromExistingBook", args)'
+      createReadLogFromNewBook:
+        type: "ReadLog!"
+        args:
+          book: "CreateBookInput!"
+          readLogInput: "CreateReadLogInput!"
+        resolve: '@=mutation("App\\GraphQL\\Mutation\\ReadLogMutation::createReadLogFromNewBook", args)'

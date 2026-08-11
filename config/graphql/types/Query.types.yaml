@@ -12,6 +12,11 @@ Query:
         args:
           query: "String"
         resolve: '@=query("App\\GraphQL\\Resolver\\RecommendationResolver::recommendBooks", args)'
+      user:
+        type: "User!"
+        args:
+          id: "Int!"
+        resolve: '@=query("App\\GraphQL\\Resolver\\UserResolver::user", args)'
       me:
         type: "User!"
         resolve: '@=query("App\\GraphQL\\Resolver\\UserResolver::me", args)'

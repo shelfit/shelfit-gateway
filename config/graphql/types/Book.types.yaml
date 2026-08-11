@@ -6,10 +6,35 @@ Book:
       title: "String!"
       author: "String!"
       genres: "[String]"
-      pageCount: "String!"
+      pageCount: "Int!"
       coverUrl: "String"
       description: "String"
       rating: "Float"
       num_ratings: "Int"
-      source: "String!"
-      visibility: "String!"
+      visibility: "BookVisibilityEnum!"
+
+BookSourceEnum:
+  type: enum
+  config:
+    values:
+      SYSTEM: "system"
+      USER: "user"
+
+BookVisibilityEnum:
+  type: enum
+  config:
+    values:
+      PUBLIC: "public"
+      PRIVATE: "private"
+
+CreateBookInput:
+  type: input-object
+  config:
+    fields:
+      title: "String!"
+      author: "String!"
+      genres: "[String]"
+      pageCount: "Int!"
+      coverUrl: "String"
+      description: "String"
+      visibility: "BookVisibilityEnum!"

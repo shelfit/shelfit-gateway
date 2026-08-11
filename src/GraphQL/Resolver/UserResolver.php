@@ -5,6 +5,7 @@ namespace App\GraphQL\Resolver;
 use App\Entity\User;
 use App\Repository\UserRepository;
 use App\Security\LoggedInUserAwareTrait;
+use Overblog\GraphQLBundle\Definition\Argument;
 use Overblog\GraphQLBundle\Definition\Resolver\QueryInterface;
 use Overblog\GraphQLBundle\Error\UserError;
 use Symfony\Bundle\SecurityBundle\Security;
@@ -18,6 +19,17 @@ readonly class UserResolver implements QueryInterface
         private UserRepository $userRepository,
         private Security $security,
     ) {
+    }
+
+    public function user(Argument $args): User
+    {
+        $user = $this->userRepository->find($args->offsetGet('id'));
+
+        if ($user === null) {
+            throw new UserError('no.user');
+        }
+
+        return $user;
     }
 
     public function me(): User
