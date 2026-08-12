@@ -5,8 +5,8 @@ namespace App\Service;
 use App\DTO\BookDto;
 use App\Entity\Book\Book;
 use App\Entity\Book\BookSource;
+use App\Exception\UserInputValidationException;
 use Doctrine\ORM\EntityManagerInterface;
-use RuntimeException;
 use Symfony\Component\Validator\ConstraintViolationListInterface;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 
@@ -20,11 +20,14 @@ readonly class BookService
     ) {
     }
 
+    /**
+     * @throws UserInputValidationException
+     */
     public function createBook(BookDto $bookDto): Book
     {
         $violations = $this->validator->validate($bookDto);
         if (count($violations) > 0) {
-            throw new RuntimeException(self::formatValidationErrorMessages($violations));
+            throw new UserInputValidationException(self::formatValidationErrorMessages($violations));
         }
 
         $book = (new Book())

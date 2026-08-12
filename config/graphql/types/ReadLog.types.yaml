@@ -12,6 +12,9 @@ ReadLog:
       createdAt: "DateTimeImmutable!"
       updatedAt: "DateTimeImmutable"
       finishedAt: "DateTimeImmutable"
+      pageUpdates:
+        type: "[ReadLogPageUpdate]!"
+        resolve: '@=query("App\\GraphQL\\Resolver\\ReadLogResolver::resolvePageUpdates", value)'
 
 ReadLogStatusEnum:
   type: enum
@@ -28,3 +31,20 @@ CreateReadLogInput:
     fields:
       currentPage: "Int"
       status: "ReadLogStatusEnum!"
+
+ReadLogPageUpdate:
+  type: object
+  config:
+    fields:
+      id: "Int!"
+      log: "ReadLog!"
+      fromPage: "Int!"
+      toPage: "Int!"
+      createdAt: "DateTimeImmutable!"
+
+CreateReadLogPageUpdateInput:
+  type: input-object
+  config:
+    fields:
+      logId: "Int!"
+      toPage: "Int!"

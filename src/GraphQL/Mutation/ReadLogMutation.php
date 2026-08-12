@@ -4,9 +4,15 @@ namespace App\GraphQL\Mutation;
 
 use App\DTO\BookDto;
 use App\DTO\ReadLogDto;
+use App\DTO\ReadLogPageUpdateDto;
 use App\Entity\ReadLog;
+use App\Entity\ReadLogPageUpdate;
+use App\Exception\AuthorizationException;
+use App\Exception\UserInputValidationException;
 use App\Repository\BookRepository;
+use App\Repository\ReadLogRepository;
 use App\Security\LoggedInUserAwareTrait;
+use App\Service\AuthorizationService;
 use App\Service\BookService;
 use App\Service\ReadLogService;
 use Doctrine\DBAL\Exception\UniqueConstraintViolationException;
@@ -28,6 +34,7 @@ readonly class ReadLogMutation implements MutationInterface
         private ReadLogService $readLogService,
         private DenormalizerInterface $denormalizer,
         private BookService $bookService,
+        private ReadLogRepository $readLogRepository,
     ) {
     }
 
@@ -68,7 +75,7 @@ readonly class ReadLogMutation implements MutationInterface
 
         try {
             $book = $this->bookService->createBook($bookDto);
-        } catch (RuntimeException $e) {
+        } catch (UserInputValidationException $e) {
             throw new UserError($e->getMessage());
         }
 
@@ -79,6 +86,31 @@ readonly class ReadLogMutation implements MutationInterface
             return $this->readLogService->createReadLog($readLogDto);
         } catch (UniqueConstraintViolationException) {
             throw new UserError('read.log.already.exists');
+        }
+    }
+
+    public function createReadLogPageUpdate(Argument $args): ReadLog
+    {
+        try {
+            $user = self::getLoggedInUser($this->security);
+        } catch (AuthenticationException) {
+            throw new UserError(self::NOT_AUTHENTICATED);
+        }
+
+        $readLog = $this->readLogRepository->find($args->offsetGet('pageUpdateInput')['logId']);
+        if ($readLog === null) {
+            throw new UserError('read.log.not.found');
+        }
+
+        $pageUpdateDto = $this->denormalizer->denormalize($args->offsetGet('pageUpdateInput'), ReadLogPageUpdateDto::class);
+        $pageUpdateDto->setUser($user)->setReadLog($readLog);
+
+        try {
+            return $this->readLogService->updateCurrentPage($pageUpdateDto);
+        } catch (AuthorizationException) {
+            throw new UserError('not.authorized');
+        } catch (UserInputValidationException) {
+            throw new UserError('invalid.to.page');
         }
     }
 }

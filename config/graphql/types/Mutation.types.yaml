@@ -24,3 +24,8 @@ Mutation:
           book: "CreateBookInput!"
           readLogInput: "CreateReadLogInput!"
         resolve: '@=mutation("App\\GraphQL\\Mutation\\ReadLogMutation::createReadLogFromNewBook", args)'
+      updateReadLogPage:
+        type: "ReadLog!"
+        args:
+          pageUpdateInput: "CreateReadLogPageUpdateInput!"
+        resolve: '@=mutation("App\\GraphQL\\Mutation\\ReadLogMutation::createReadLogPageUpdate", args)'

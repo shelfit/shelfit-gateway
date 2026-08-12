@@ -7,6 +7,11 @@ Query:
         args:
           id: "Int!"
         resolve: '@=query("App\\GraphQL\\Resolver\\BookResolver::resolveBook", args)'
+      readLog:
+        type: "ReadLog"
+        args:
+          id: "Int!"
+        resolve: '@=query("App\\GraphQL\\Resolver\\ReadLogResolver::readLog", args)'
       recommendBooks:
         type: "[Book]"
         args:

@@ -4,6 +4,8 @@ namespace App\Entity;
 
 use App\Entity\Book\Book;
 use App\Repository\ReadLogRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
@@ -44,6 +46,17 @@ class ReadLog
 
     #[ORM\Column(nullable: true)]
     private ?\DateTimeImmutable $finishedAt = null;
+
+    /**
+     * @var Collection<int, ReadLogPageUpdate>
+     */
+    #[ORM\OneToMany(targetEntity: ReadLogPageUpdate::class, mappedBy: 'log', orphanRemoval: true)]
+    private Collection $readLogPageUpdates;
+
+    public function __construct()
+    {
+        $this->readLogPageUpdates = new ArrayCollection();
+    }
 
     public function getId(): ?int
     {
@@ -154,6 +167,36 @@ class ReadLog
     public function setFinishedAt(?\DateTimeImmutable $finishedAt): static
     {
         $this->finishedAt = $finishedAt;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, ReadLogPageUpdate>
+     */
+    public function getReadLogPageUpdates(): Collection
+    {
+        return $this->readLogPageUpdates;
+    }
+
+    public function addReadLogPageUpdate(ReadLogPageUpdate $readLogPageUpdate): static
+    {
+        if (!$this->readLogPageUpdates->contains($readLogPageUpdate)) {
+            $this->readLogPageUpdates->add($readLogPageUpdate);
+            $readLogPageUpdate->setLog($this);
+        }
+
+        return $this;
+    }
+
+    public function removeReadLogPageUpdate(ReadLogPageUpdate $readLogPageUpdate): static
+    {
+        if ($this->readLogPageUpdates->removeElement($readLogPageUpdate)) {
+            // set the owning side to null (unless already changed)
+            if ($readLogPageUpdate->getLog() === $this) {
+                $readLogPageUpdate->setLog(null);
+            }
+        }
 
         return $this;
     }
