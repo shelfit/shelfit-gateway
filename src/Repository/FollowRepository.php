@@ -2,6 +2,7 @@
 
 namespace App\Repository;
 
+use App\DTO\Common\PaginationSortDto;
 use App\Entity\Follow;
 use App\Entity\User;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
@@ -18,15 +19,15 @@ class FollowRepository extends ServiceEntityRepository
         parent::__construct($registry, Follow::class);
     }
 
-    public function getFollowersByUser(User $user, int $limit, int $offset): array
+    public function getFollowersByUser(User $user, PaginationSortDto $paginationSortDto): array
     {
         return $this->createQueryBuilder('f')
             ->select('u')
             ->innerJoin(User::class, 'u', Join::WITH, 'f.follower = u')
             ->where('f.following = :user')
             ->setParameter('user', $user)
-            ->setFirstResult($offset)
-            ->setMaxResults($limit)
+            ->setFirstResult($paginationSortDto->getOffset())
+            ->setMaxResults($paginationSortDto->getLimit())
             ->getQuery()
             ->getResult();
     }
@@ -41,15 +42,15 @@ class FollowRepository extends ServiceEntityRepository
             ->getSingleScalarResult();
     }
 
-    public function getFollowingByUser(User $user, int $limit, int $offset): array
+    public function getFollowingByUser(User $user, PaginationSortDto $paginationSortDto): array
     {
         return $this->createQueryBuilder('f')
             ->select('u')
             ->innerJoin(User::class, 'u', Join::WITH, 'f.following = u')
             ->where('f.follower = :user')
             ->setParameter('user', $user)
-            ->setFirstResult($offset)
-            ->setMaxResults($limit)
+            ->setFirstResult($paginationSortDto->getOffset())
+            ->setMaxResults($paginationSortDto->getLimit())
             ->getQuery()
             ->getResult();
     }

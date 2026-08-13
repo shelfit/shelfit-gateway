@@ -14,7 +14,12 @@ ReadLog:
       finishedAt: "DateTimeImmutable"
       pageUpdates:
         type: "[ReadLogPageUpdate]!"
-        resolve: '@=query("App\\GraphQL\\Resolver\\ReadLogResolver::resolvePageUpdates", value)'
+        args:
+          limit: "Int"
+          offset: "Int"
+          sortField: "ReadLogPageUpdateSortableFieldsEnum"
+          sortDirection: "SortDirectionEnum"
+        resolve: '@=query("App\\GraphQL\\Resolver\\ReadLogResolver::resolvePageUpdates", args, value)'
 
 ReadLogStatusEnum:
   type: enum
@@ -24,6 +29,21 @@ ReadLogStatusEnum:
       FINISHED: "finished"
       TBR: "tbr"
       DNF: "dnf"
+
+ReadLogSortableFieldsEnum:
+  type: enum
+  config:
+    values:
+      CREATED_AT: 'createdAt'
+      UPDATED_AT: 'updatedAt'
+      FINISHED_AT: 'finishedAt'
+      RATING: 'rating'
+
+ReadLogPageUpdateSortableFieldsEnum:
+  type: enum
+  config:
+    values:
+      CREATED_AT: 'createdAt'
 
 CreateReadLogInput:
   type: input-object

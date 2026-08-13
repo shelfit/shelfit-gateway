@@ -2,13 +2,17 @@
 
 namespace App\GraphQL\Resolver;
 
+use App\DTO\Common\PaginationSortDto;
 use App\Entity\User;
+use App\GraphQL\Util\PaginatedResolverTrait;
 use App\Repository\FollowRepository;
 use Overblog\GraphQLBundle\Definition\Argument;
 use Overblog\GraphQLBundle\Definition\Resolver\QueryInterface;
 
 readonly class FollowResolver implements QueryInterface
 {
+    use PaginatedResolverTrait;
+
     public function __construct(
         private FollowRepository $followRepository,
     ) {
@@ -19,11 +23,10 @@ readonly class FollowResolver implements QueryInterface
      */
     public function followers(Argument $args, User $value): array
     {
-        $limit = (int)($args->offsetGet('limit') ?? 10);
-        $offset = (int)($args->offsetGet('offset') ?? 0);
+        $paginationSortDto = self::paginationSortDtoFromArgs($args, 'createdAt');
 
         return [
-            'users' => $this->followRepository->getFollowersByUser($value, $limit, $offset),
+            'users' => $this->followRepository->getFollowersByUser($value, $paginationSortDto),
             'count' => $this->followRepository->getFollowerCountByUser($value),
         ];
     }
@@ -33,11 +36,10 @@ readonly class FollowResolver implements QueryInterface
      */
     public function following(Argument $args, User $value): array
     {
-        $limit = (int)($args->offsetGet('limit') ?? 10);
-        $offset = (int)($args->offsetGet('offset') ?? 0);
+        $paginationSortDto = self::paginationSortDtoFromArgs($args, 'createdAt');
 
         return [
-            'users' => $this->followRepository->getFollowingByUser($value, $limit, $offset),
+            'users' => $this->followRepository->getFollowingByUser($value, $paginationSortDto),
             'count' => $this->followRepository->getFollowingCountByUser($value),
         ];
     }

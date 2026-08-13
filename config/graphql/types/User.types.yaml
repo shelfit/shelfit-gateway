@@ -17,3 +17,12 @@ User:
           limit: "Int"
           offset: "Int"
         resolve: '@=query("App\\GraphQL\\Resolver\\FollowResolver::following", args, value)'
+      readLogs:
+        type: "[ReadLog]!"
+        args:
+          statuses: "[ReadLogStatusEnum!]"
+          limit: "Int"
+          offset: "Int"
+          sortField: "ReadLogSortableFieldsEnum"
+          sortDirection: "SortDirectionEnum"
+        resolve: '@=query("App\\GraphQL\\Resolver\\ReadLogResolver::userReadLogs", args, value)'

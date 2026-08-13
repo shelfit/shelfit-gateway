@@ -1,0 +1,6 @@
+SortDirectionEnum:
+  type: enum
+  config:
+    values:
+      ASC: 'asc'
+      DESC: 'desc'
