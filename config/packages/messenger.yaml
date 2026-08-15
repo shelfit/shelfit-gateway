@@ -1,6 +1,12 @@
 framework:
     messenger:
         transports:
+            util:
+              dsn: '%env(MESSENGER_TRANSPORT_DSN)%'
+              options:
+                exchange: { name: 'gateway.util' }
+                queues:
+                  gateway.util: ~
             mailer_dispatch:
               dsn: '%env(MESSENGER_TRANSPORT_DSN)%'
               options:
@@ -10,4 +16,4 @@ framework:
 
         routing:
             'App\Message\SendEmailMessage': mailer_dispatch
-
+            'App\Message\RecalculateBookRatingMessage': util

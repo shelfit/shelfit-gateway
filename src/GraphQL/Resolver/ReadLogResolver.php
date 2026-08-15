@@ -2,10 +2,9 @@
 
 namespace App\GraphQL\Resolver;
 
-use App\DTO\Common\PaginationSortDto;
-use App\Entity\Book\BookStatus;
 use App\Entity\ReadLog;
 use App\Entity\ReadLogPageUpdate;
+use App\Entity\ReadLogStatus;
 use App\Entity\User;
 use App\GraphQL\Util\PaginatedResolverTrait;
 use App\Repository\ReadLogPageUpdateRepository;
@@ -44,8 +43,8 @@ readonly class ReadLogResolver implements QueryInterface
     {
         $paginationSortDto = self::paginationSortDtoFromArgs($args, 'updatedAt');
         $statuses = array_intersect(
-            BookStatus::ALL_STATUSES,
-            ($args->offsetGet('statuses') ?? BookStatus::ALL_STATUSES)
+            ReadLogStatus::ALL_STATUSES,
+            ($args->offsetGet('statuses') ?? ReadLogStatus::ALL_STATUSES)
         );
 
         $logs = [];

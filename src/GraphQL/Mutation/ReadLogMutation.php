@@ -4,7 +4,7 @@ namespace App\GraphQL\Mutation;
 
 use App\DTO\BookDto;
 use App\DTO\ReadLogDto;
-use App\DTO\ReadLogPageUpdateDto;
+use App\DTO\ReadLogUpdateDto;
 use App\Entity\ReadLog;
 use App\Entity\ReadLogPageUpdate;
 use App\Exception\AuthorizationException;
@@ -35,6 +35,7 @@ readonly class ReadLogMutation implements MutationInterface
         private DenormalizerInterface $denormalizer,
         private BookService $bookService,
         private ReadLogRepository $readLogRepository,
+        private AuthorizationService $authorizationService,
     ) {
     }
 
@@ -102,15 +103,46 @@ readonly class ReadLogMutation implements MutationInterface
             throw new UserError('read.log.not.found');
         }
 
-        $pageUpdateDto = $this->denormalizer->denormalize($args->offsetGet('pageUpdateInput'), ReadLogPageUpdateDto::class);
-        $pageUpdateDto->setUser($user)->setReadLog($readLog);
+        if (!$this->authorizationService->authorizeReadLogUpdates($readLog, $user)) {
+            throw new UserError('not.authorized');
+        }
 
         try {
-            return $this->readLogService->updateCurrentPage($pageUpdateDto);
-        } catch (AuthorizationException) {
-            throw new UserError('not.authorized');
+            return $this->readLogService->updateCurrentPage(
+                $readLog,
+                $args->offsetGet('pageUpdateInput')['toPage']
+            );
         } catch (UserInputValidationException) {
             throw new UserError('invalid.to.page');
+        }
+    }
+
+    public function updateReadLog(Argument $args): ReadLog
+    {
+        try {
+            $user = self::getLoggedInUser($this->security);
+        } catch (AuthenticationException) {
+            throw new UserError(self::NOT_AUTHENTICATED);
+        }
+
+        $readLog = $this->readLogRepository->find($args->offsetGet('updateReadLogInput')['logId']);
+        if ($readLog === null) {
+            throw new UserError('read.log.not.found');
+        }
+
+        if (!$this->authorizationService->authorizeReadLogUpdates($readLog, $user)) {
+            throw new UserError('not.authorized');
+        }
+
+        $readLogUpdateDto = $this->denormalizer->denormalize(
+            $args->offsetGet('updateReadLogInput'),
+            ReadLogUpdateDto::class
+        );
+
+        try {
+            return $this->readLogService->updateReadLog($readLog, $readLogUpdateDto);
+        } catch (UserInputValidationException $e) {
+            throw new UserError($e->getMessage());
         }
     }
 }

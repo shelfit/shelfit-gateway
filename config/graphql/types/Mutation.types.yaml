@@ -29,3 +29,8 @@ Mutation:
         args:
           pageUpdateInput: "CreateReadLogPageUpdateInput!"
         resolve: '@=mutation("App\\GraphQL\\Mutation\\ReadLogMutation::createReadLogPageUpdate", args)'
+      updateReadLog:
+        type: "ReadLog!"
+        args:
+          updateReadLogInput: "UpdateReadLogInput!"
+        resolve: '@=mutation("App\\GraphQL\\Mutation\\ReadLogMutation::updateReadLog", args)'

@@ -7,7 +7,7 @@ use App\Entity\User;
 
 readonly class AuthorizationService
 {
-    public function authorizeReadLogPageUpdate(ReadLog $log, User $user): bool
+    public function authorizeReadLogUpdates(ReadLog $log, User $user): bool
     {
         return $log->getUser()->getId() === $user->getId();
     }

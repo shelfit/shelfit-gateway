@@ -52,6 +52,15 @@ CreateReadLogInput:
       currentPage: "Int"
       status: "ReadLogStatusEnum!"
 
+UpdateReadLogInput:
+  type: input-object
+  config:
+    fields:
+      logId: "Int!"
+      rating: "Float"
+      review: "String"
+      status: "ReadLogStatusEnum"
+
 ReadLogPageUpdate:
   type: object
   config:

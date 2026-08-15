@@ -1,8 +1,8 @@
 <?php
 
-namespace App\Entity\Book;
+namespace App\Entity;
 
-class BookStatus
+class ReadLogStatus
 {
     public const STATUS_READING = 'reading';
     public const STATUS_FINISHED = 'finished';

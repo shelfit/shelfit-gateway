@@ -3,20 +3,24 @@
 namespace App\Service;
 
 use App\DTO\ReadLogDto;
-use App\DTO\ReadLogPageUpdateDto;
-use App\Entity\Book\BookStatus;
+use App\DTO\ReadLogUpdateDto;
 use App\Entity\ReadLog;
 use App\Entity\ReadLogPageUpdate;
-use App\Exception\AuthorizationException;
+use App\Entity\ReadLogStatus;
 use App\Exception\UserInputValidationException;
+use App\Message\RecalculateBookRatingMessage;
 use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
+use Symfony\Component\Messenger\Exception\ExceptionInterface;
+use Symfony\Component\Messenger\MessageBusInterface;
+use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 readonly class ReadLogService
 {
     public function __construct(
         private EntityManagerInterface $entityManager,
-        private AuthorizationService $authorizationService,
+        private MessageBusInterface $bus,
+        private ValidatorInterface $validator,
     ) {
     }
 
@@ -53,24 +57,12 @@ readonly class ReadLogService
     }
 
     /**
-     * @throws AuthorizationException
      * @throws UserInputValidationException
      */
-    public function updateCurrentPage(ReadLogPageUpdateDto $readLogPageUpdateDto): ReadLog
+    public function updateCurrentPage(ReadLog $readLog, int $toPage): ReadLog
     {
-        if (!$this->authorizationService->authorizeReadLogPageUpdate(
-            $readLogPageUpdateDto->getReadLog(),
-            $readLogPageUpdateDto->getUser())
-        )  {
-            throw new AuthorizationException();
-        }
-
-        $readLog = $readLogPageUpdateDto->getReadLog();
         $book = $readLog->getBook();
-        if (
-            $readLogPageUpdateDto->getToPage() <= $readLog->getCurrentPage() ||
-            $readLogPageUpdateDto->getToPage() > $book->getPageCount()
-        ) {
+        if ($toPage <= $readLog->getCurrentPage() || $toPage > $book->getPageCount()) {
             throw new UserInputValidationException();
         }
 
@@ -79,16 +71,16 @@ readonly class ReadLogService
         $readLogPageUpdate = (new ReadLogPageUpdate())
             ->setLog($readLog)
             ->setFromPage($readLog->getCurrentPage())
-            ->setToPage($readLogPageUpdateDto->getToPage())
+            ->setToPage($toPage)
             ->setCreatedAt(new DateTimeImmutable());
 
         $readLog
-            ->setCurrentPage($readLogPageUpdateDto->getToPage())
+            ->setCurrentPage($toPage)
             ->setUpdatedAt(new DateTimeImmutable());
 
-        if ($readLogPageUpdateDto->getToPage() === $book->getPageCount()) {
+        if ($toPage === $book->getPageCount()) {
             $readLog
-                ->setStatus(BookStatus::STATUS_FINISHED)
+                ->setStatus(ReadLogStatus::STATUS_FINISHED)
                 ->setFinishedAt(new DateTimeImmutable());
         }
 
@@ -97,6 +89,59 @@ readonly class ReadLogService
         $this->entityManager->flush();
 
         $this->entityManager->commit();
+
+        return $readLog;
+    }
+
+    /**
+     * @throws UserInputValidationException
+     * @throws ExceptionInterface
+     */
+    public function updateReadLog(ReadLog $readLog, ReadLogUpdateDto $updateDto): ReadLog
+    {
+        $violations = $this->validator->validate($updateDto);
+        if (count($violations) > 0) {
+            throw new UserInputValidationException('invalid.rating');
+        }
+
+        if (
+            $updateDto->getRating() === null &&
+            $updateDto->getReview() === null &&
+            $updateDto->getStatus() === null
+        ) {
+            return $readLog;
+        }
+
+        $previousRating = $readLog->getRating();
+
+        if ($updateDto->getRating() !== null) {
+            $readLog->setRating($updateDto->getRating());
+        }
+
+        if ($updateDto->getReview() !== null) {
+            $readLog->setReview($updateDto->getReview());
+        }
+
+        if ($updateDto->getStatus() !== null) {
+            $readLog->setStatus($updateDto->getStatus());
+
+            if ($updateDto->getStatus() === ReadLogStatus::STATUS_FINISHED) {
+                $readLog->setFinishedAt(new DateTimeImmutable());
+            }
+        }
+
+        $readLog->setUpdatedAt(new DateTimeImmutable());
+
+        $this->entityManager->persist($readLog);
+        $this->entityManager->flush();
+
+        if ($updateDto->getRating() !== null && $updateDto->getRating() !== $previousRating) {
+            $this->bus->dispatch(new RecalculateBookRatingMessage(
+                $readLog->getBook()->getId(),
+                $updateDto->getRating(),
+                $previousRating
+            ));
+        }
 
         return $readLog;
     }

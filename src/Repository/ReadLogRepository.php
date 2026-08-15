@@ -3,8 +3,8 @@
 namespace App\Repository;
 
 use App\DTO\Common\PaginationSortDto;
-use App\Entity\Book\BookStatus;
 use App\Entity\ReadLog;
+use App\Entity\ReadLogStatus;
 use App\Entity\User;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
@@ -20,7 +20,7 @@ class ReadLogRepository extends ServiceEntityRepository
     }
 
     /**
-     * @param BookStatus[] $statuses
+     * @param ReadLogStatus[] $statuses
      * @return ReadLog[]
      */
     public function getUserReadLogs(User $user, array $statuses, PaginationSortDto $paginationSortDto): array
