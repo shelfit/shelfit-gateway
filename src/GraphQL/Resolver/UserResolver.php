@@ -3,6 +3,7 @@
 namespace App\GraphQL\Resolver;
 
 use App\Entity\User;
+use App\GraphQL\Util\PaginatedResolverTrait;
 use App\Repository\UserRepository;
 use App\Security\LoggedInUserAwareTrait;
 use Overblog\GraphQLBundle\Definition\Argument;
@@ -13,7 +14,7 @@ use Symfony\Component\Security\Core\Exception\AuthenticationException;
 
 readonly class UserResolver implements QueryInterface
 {
-    use LoggedInUserAwareTrait;
+    use LoggedInUserAwareTrait, PaginatedResolverTrait;
 
     public function __construct(
         private UserRepository $userRepository,
@@ -39,5 +40,15 @@ readonly class UserResolver implements QueryInterface
         } catch (AuthenticationException) {
             throw new UserError(self::NOT_AUTHENTICATED);
         }
+    }
+
+    /**
+     * @return User[]
+     */
+    public function searchUsers(Argument $args): array
+    {
+        $query = $args->offsetGet('query');
+        $paginationSortDto = self::paginationSortDtoFromArgs($args, 'createdAt');
+        return $this->userRepository->searchUsers($query, $paginationSortDto);
     }
 }

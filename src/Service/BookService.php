@@ -3,12 +3,15 @@
 namespace App\Service;
 
 use App\DTO\BookDto;
+use App\DTO\Common\PaginationSortDto;
 use App\Entity\Book\Book;
 use App\Entity\Book\BookSource;
 use App\Exception\UserInputValidationException;
+use App\Repository\BookRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Validator\ConstraintViolationListInterface;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
+use Throwable;
 
 readonly class BookService
 {
@@ -17,6 +20,8 @@ readonly class BookService
     public function __construct(
         private ValidatorInterface $validator,
         private EntityManagerInterface $entityManager,
+        private QdrantService $qdrantService,
+        private BookRepository $bookRepository,
     ) {
     }
 
@@ -58,5 +63,35 @@ readonly class BookService
             };
         }
         return implode("\n", $messages);
+    }
+
+    /**
+     * @return Book[]
+     */
+    public function searchBooks(string $query, PaginationSortDto $paginationSortDto): array
+    {
+        try {
+            $recommenderBooks = $this->qdrantService->searchBooks(
+                $query,
+                $paginationSortDto->getLimit(),
+                $paginationSortDto->getOffset()
+            );
+        } catch (Throwable) {
+            $recommenderBooks = [];
+        }
+
+        $repositoryBooks = $this->bookRepository->searchBooks($query, $paginationSortDto);
+
+        $limitSplit = ceil($paginationSortDto->getLimit() / 2);
+
+        if (empty($recommenderBooks) || empty($repositoryBooks)) {
+            $booksMerged = array_merge($repositoryBooks, $recommenderBooks);
+        } else {
+            $booksMerged = array_merge(
+                array_slice($repositoryBooks, 0, $limitSplit),
+                array_slice($recommenderBooks, 0, $limitSplit)
+            );
+        }
+        return array_slice($booksMerged, 0, $paginationSortDto->getLimit());
     }
 }

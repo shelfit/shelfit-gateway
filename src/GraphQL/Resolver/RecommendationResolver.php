@@ -3,7 +3,7 @@
 namespace App\GraphQL\Resolver;
 
 use App\Security\LoggedInUserAwareTrait;
-use App\Service\RecommendationService;
+use App\Service\QdrantService;
 use Overblog\GraphQLBundle\Definition\Argument;
 use Overblog\GraphQLBundle\Definition\Resolver\QueryInterface;
 use Overblog\GraphQLBundle\Error\UserError;
@@ -17,9 +17,9 @@ readonly class RecommendationResolver implements QueryInterface
     use LoggedInUserAwareTrait;
 
     public function __construct(
-        private RecommendationService $recommendationService,
+        private QdrantService   $recommendationService,
         private LoggerInterface $logger,
-        private Security $security,
+        private Security        $security,
     ) {
     }
 

@@ -2,6 +2,7 @@
 
 namespace App\Repository;
 
+use App\DTO\Common\PaginationSortDto;
 use App\Entity\User;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
@@ -33,28 +34,17 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
         $this->getEntityManager()->flush();
     }
 
-    //    /**
-    //     * @return User[] Returns an array of User objects
-    //     */
-    //    public function findByExampleField($value): array
-    //    {
-    //        return $this->createQueryBuilder('u')
-    //            ->andWhere('u.exampleField = :val')
-    //            ->setParameter('val', $value)
-    //            ->orderBy('u.id', 'ASC')
-    //            ->setMaxResults(10)
-    //            ->getQuery()
-    //            ->getResult()
-    //        ;
-    //    }
-
-    //    public function findOneBySomeField($value): ?User
-    //    {
-    //        return $this->createQueryBuilder('u')
-    //            ->andWhere('u.exampleField = :val')
-    //            ->setParameter('val', $value)
-    //            ->getQuery()
-    //            ->getOneOrNullResult()
-    //        ;
-    //    }
+    /**
+     * @return User[]
+     */
+    public function searchUsers(string $query, PaginationSortDto $paginationSortDto): array
+    {
+        return $this->createQueryBuilder('u')
+            ->where('lower(u.username) LIKE :query')
+            ->setParameter('query', '%'.strtolower($query).'%')
+            ->setFirstResult($paginationSortDto->getOffset())
+            ->setMaxResults($paginationSortDto->getLimit())
+            ->getQuery()
+            ->getResult();
+    }
 }

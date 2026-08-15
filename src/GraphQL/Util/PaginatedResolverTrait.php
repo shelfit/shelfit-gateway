@@ -7,12 +7,12 @@ use Overblog\GraphQLBundle\Definition\Argument;
 
 trait PaginatedResolverTrait
 {
-    public static function paginationSortDtoFromArgs(Argument $args, string $defaultSortField): PaginationSortDto
+    public static function paginationSortDtoFromArgs(Argument $args, string $defaultSortField, string $sortDirection = 'asc'): PaginationSortDto
     {
         return (new PaginationSortDto())
             ->setLimit((int)($args->offsetGet('limit') ?? PaginationSortDto::DEFAULT_LIMIT))
             ->setOffset((int)($args->offsetGet('offset') ?? PaginationSortDto::DEFAULT_OFFSET))
             ->setSortField($args->offsetGet('sortField') ?? $defaultSortField)
-            ->setSortDirection($args->offsetGet('sortDirection') ?? 'asc');
+            ->setSortDirection($args->offsetGet('sortDirection') ?? $sortDirection);
     }
 }

@@ -15,7 +15,7 @@ Query:
       recommendBooks:
         type: "[Book]"
         args:
-          query: "String"
+          query: "String!"
         resolve: '@=query("App\\GraphQL\\Resolver\\RecommendationResolver::recommendBooks", args)'
       user:
         type: "User!"
@@ -25,3 +25,17 @@ Query:
       me:
         type: "User!"
         resolve: '@=query("App\\GraphQL\\Resolver\\UserResolver::me", args)'
+      searchUsers:
+        type: "[User]!"
+        args:
+          query: "String!"
+          limit: "Int"
+          offset: "Int"
+        resolve: '@=query("App\\GraphQL\\Resolver\\UserResolver::searchUsers", args)'
+      searchBooks:
+        type: "[Book]!"
+        args:
+          query: "String!"
+          limit: "Int"
+          offset: "Int"
+        resolve: '@=query("App\\GraphQL\\Resolver\\BookResolver::searchBooks", args)'
