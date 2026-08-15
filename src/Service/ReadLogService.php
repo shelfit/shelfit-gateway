@@ -9,6 +9,7 @@ use App\Entity\ReadLogPageUpdate;
 use App\Entity\ReadLogStatus;
 use App\Exception\UserInputValidationException;
 use App\Message\RecalculateBookRatingMessage;
+use App\Repository\ReadLogPageUpdateRepository;
 use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Messenger\Exception\ExceptionInterface;
@@ -21,6 +22,7 @@ readonly class ReadLogService
         private EntityManagerInterface $entityManager,
         private MessageBusInterface $bus,
         private ValidatorInterface $validator,
+        private ReadLogPageUpdateRepository $readLogPageUpdateRepository,
     ) {
     }
 
@@ -91,6 +93,31 @@ readonly class ReadLogService
         $this->entityManager->commit();
 
         return $readLog;
+    }
+
+    public function deletePageUpdate(ReadLogPageUpdate $pageUpdate): void
+    {
+        $readLog = $pageUpdate->getLog();
+        $lastUpdate = $this->readLogPageUpdateRepository->getLastPageUpdateForLog($readLog);
+
+        $this->entityManager->beginTransaction();
+
+        if ($lastUpdate !== null && $lastUpdate->getId() === $pageUpdate->getId()) {
+            $readLog->setCurrentPage($pageUpdate->getFromPage());
+
+            if ($pageUpdate->getToPage() === $readLog->getBook()->getPageCount() &&
+                $readLog->getStatus() === ReadLogStatus::STATUS_FINISHED) {
+                $readLog->setStatus(ReadLogStatus::STATUS_READING);
+            }
+        }
+
+        $readLog->setUpdatedAt(new DateTimeImmutable());
+
+        $this->entityManager->persist($readLog);
+        $this->entityManager->remove($pageUpdate);
+        $this->entityManager->flush();
+
+        $this->entityManager->commit();
     }
 
     /**

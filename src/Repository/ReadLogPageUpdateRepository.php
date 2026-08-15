@@ -32,4 +32,15 @@ class ReadLogPageUpdateRepository extends ServiceEntityRepository
             ->getQuery()
             ->getResult();
     }
+
+    public function getLastPageUpdateForLog(ReadLog $readLog): ?ReadLogPageUpdate
+    {
+        return $this->createQueryBuilder('pu')
+            ->where('pu.log = :readLog')
+            ->setParameter('readLog', $readLog)
+            ->orderBy("pu.createdAt", "DESC")
+            ->setMaxResults(1)
+            ->getQuery()
+            ->getOneOrNullResult();
+    }
 }

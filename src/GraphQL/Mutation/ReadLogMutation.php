@@ -6,10 +6,9 @@ use App\DTO\BookDto;
 use App\DTO\ReadLogDto;
 use App\DTO\ReadLogUpdateDto;
 use App\Entity\ReadLog;
-use App\Entity\ReadLogPageUpdate;
-use App\Exception\AuthorizationException;
 use App\Exception\UserInputValidationException;
 use App\Repository\BookRepository;
+use App\Repository\ReadLogPageUpdateRepository;
 use App\Repository\ReadLogRepository;
 use App\Security\LoggedInUserAwareTrait;
 use App\Service\AuthorizationService;
@@ -19,7 +18,6 @@ use Doctrine\DBAL\Exception\UniqueConstraintViolationException;
 use Overblog\GraphQLBundle\Definition\Argument;
 use Overblog\GraphQLBundle\Definition\Resolver\MutationInterface;
 use Overblog\GraphQLBundle\Error\UserError;
-use RuntimeException;
 use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
 use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
@@ -36,6 +34,7 @@ readonly class ReadLogMutation implements MutationInterface
         private BookService $bookService,
         private ReadLogRepository $readLogRepository,
         private AuthorizationService $authorizationService,
+        private ReadLogPageUpdateRepository $readLogPageUpdateRepository,
     ) {
     }
 
@@ -103,7 +102,7 @@ readonly class ReadLogMutation implements MutationInterface
             throw new UserError('read.log.not.found');
         }
 
-        if (!$this->authorizationService->authorizeReadLogUpdates($readLog, $user)) {
+        if (!$this->authorizationService->authorizeReadLogActions($readLog, $user)) {
             throw new UserError('not.authorized');
         }
 
@@ -115,6 +114,27 @@ readonly class ReadLogMutation implements MutationInterface
         } catch (UserInputValidationException) {
             throw new UserError('invalid.to.page');
         }
+    }
+
+    public function deleteReadLogPageUpdate(Argument $args): bool
+    {
+        try {
+            $user = self::getLoggedInUser($this->security);
+        } catch (AuthenticationException) {
+            throw new UserError(self::NOT_AUTHENTICATED);
+        }
+
+        $pageUpdate = $this->readLogPageUpdateRepository->find($args->offsetGet('pageUpdateId'));
+        if ($pageUpdate === null) {
+            throw new UserError('page.update.not.found');
+        }
+
+        if (!$this->authorizationService->authorizeReadLogActions($pageUpdate->getLog(), $user)) {
+            throw new UserError('not.authorized');
+        }
+
+        $this->readLogService->deletePageUpdate($pageUpdate);
+        return true;
     }
 
     public function updateReadLog(Argument $args): ReadLog
@@ -130,7 +150,7 @@ readonly class ReadLogMutation implements MutationInterface
             throw new UserError('read.log.not.found');
         }
 
-        if (!$this->authorizationService->authorizeReadLogUpdates($readLog, $user)) {
+        if (!$this->authorizationService->authorizeReadLogActions($readLog, $user)) {
             throw new UserError('not.authorized');
         }
 
