@@ -7,6 +7,7 @@ use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: FollowRepository::class)]
 #[ORM\UniqueConstraint(name: 'UNIQ_FOLLOWER_FOLLOWING', columns: ['follower_id', 'following_id'])]
+#[ORM\Index(name: 'IDX_FOLLOWING_FOLLOWER', columns: ['following_id', 'follower_id'])]
 class Follow
 {
     #[ORM\Id]

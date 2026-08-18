@@ -23,8 +23,8 @@ RUN set -eux; \
         zip \
         sockets \
     ; \
-    pecl install amqp; \
-    docker-php-ext-enable amqp; \
+    pecl install amqp redis; \
+    docker-php-ext-enable amqp redis; \
     rm -f /etc/nginx/sites-enabled/default; \
     rm -rf /var/lib/apt/lists/*
 

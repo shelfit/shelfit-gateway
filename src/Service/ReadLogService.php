@@ -4,6 +4,8 @@ namespace App\Service;
 
 use App\DTO\ReadLogDto;
 use App\DTO\ReadLogUpdateDto;
+use App\Entity\Book\BookVisibility;
+use App\Entity\FeedPostType;
 use App\Entity\ReadLog;
 use App\Entity\ReadLogPageUpdate;
 use App\Entity\ReadLogStatus;
@@ -23,6 +25,7 @@ readonly class ReadLogService
         private MessageBusInterface $bus,
         private ValidatorInterface $validator,
         private ReadLogPageUpdateRepository $readLogPageUpdateRepository,
+        private FeedPostService $feedPostService,
     ) {
     }
 
@@ -140,6 +143,7 @@ readonly class ReadLogService
         }
 
         $previousRating = $readLog->getRating();
+        $previousReview = $readLog->getReview();
 
         if ($updateDto->getRating() !== null) {
             $readLog->setRating($updateDto->getRating());
@@ -168,6 +172,16 @@ readonly class ReadLogService
                 $updateDto->getRating(),
                 $previousRating
             ));
+        }
+
+        if (
+            $readLog->getBook()->getVisibility() === BookVisibility::VISIBILITY_PUBLIC &&
+            (
+                ($updateDto->getRating() !== null && $previousRating === null) ||
+                ($updateDto->getReview() !== null && $previousReview === null)
+            )
+        ) {
+            $this->feedPostService->createPostFromReadLog($readLog, $readLog->getUser(), FeedPostType::TYPE_REVIEW);
         }
 
         return $readLog;

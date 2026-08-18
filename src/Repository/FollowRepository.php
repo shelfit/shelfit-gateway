@@ -8,6 +8,7 @@ use App\Entity\User;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\ORM\Query\Expr\Join;
 use Doctrine\Persistence\ManagerRegistry;
+use Generator;
 
 /**
  * @extends ServiceEntityRepository<Follow>
@@ -74,5 +75,30 @@ class FollowRepository extends ServiceEntityRepository
             ->setParameter('followingId', $followingId)
             ->getQuery()
             ->getOneOrNullResult();
+    }
+
+    public function getUserFollowers(int $userId, int $batchSize): Generator
+    {
+        $lastId = 0;
+
+        do {
+            $followerIds = $this->createQueryBuilder('f')
+                ->select('identity(f.follower) as id')
+                ->where('f.following = :userId')
+                ->andWhere('f.follower > :lastId')
+                ->setParameter('userId', $userId)
+                ->setParameter('lastId', $lastId)
+                ->orderBy('f.follower', 'asc')
+                ->setMaxResults($batchSize)
+                ->getQuery()
+                ->getSingleColumnResult();
+
+            if (empty($followerIds)) {
+                return;
+            }
+
+            $lastId = end($followerIds);
+            yield $followerIds;
+        } while (count($followerIds) === $batchSize);
     }
 }

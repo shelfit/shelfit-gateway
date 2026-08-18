@@ -11,6 +11,13 @@ services:
     App\:
         resource: '../src/'
 
+    Redis:
+      class: \Redis
+      factory: ['Symfony\Component\Cache\Adapter\RedisAdapter', 'createConnection']
+      arguments:
+        - '%env(REDIS_URL)%'
+        - { persistent: true }
+
     App\Service\RegistrationService:
       arguments:
         $frontendBaseUri: '%env(FRONTEND_BASE_URI)%'
