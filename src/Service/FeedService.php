@@ -9,6 +9,7 @@ use App\Message\CacheFeedPostMessage;
 use App\Repository\FeedPostRepository;
 use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
+use RedisException;
 use Symfony\Component\Messenger\MessageBusInterface;
 
 readonly class FeedService
@@ -43,9 +44,14 @@ readonly class FeedService
      */
     public function getFeed(User $user, int $offset): array
     {
-        $ids = $this->feedCacheService->getFeedForUser($user->getId(), self::FEED_PAGE_LIMIT, $offset);
-        $posts = $this->feedPostRepository->findBy(['id' => $ids]);
-        usort($posts, static fn($a, $b) => $b->getCreatedAt() <=> $a->getCreatedAt());
-        return $posts;
+        try {
+            $ids = $this->feedCacheService->getFeedForUser($user->getId(), self::FEED_PAGE_LIMIT, $offset);
+            $posts = $this->feedPostRepository->findBy(['id' => $ids]);
+            usort($posts, static fn($a, $b) => $b->getCreatedAt() <=> $a->getCreatedAt());
+            return $posts;
+        } catch (RedisException) {
+        }
+
+        return $this->feedPostRepository->getFeedForUser($user, self::FEED_PAGE_LIMIT, $offset);
     }
 }

@@ -3,7 +3,10 @@
 namespace App\Repository;
 
 use App\Entity\FeedPost;
+use App\Entity\Follow;
+use App\Entity\User;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Doctrine\ORM\Query\Expr\Join;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
@@ -16,28 +19,19 @@ class FeedPostRepository extends ServiceEntityRepository
         parent::__construct($registry, FeedPost::class);
     }
 
-    //    /**
-    //     * @return FeedPost[] Returns an array of FeedPost objects
-    //     */
-    //    public function findByExampleField($value): array
-    //    {
-    //        return $this->createQueryBuilder('f')
-    //            ->andWhere('f.exampleField = :val')
-    //            ->setParameter('val', $value)
-    //            ->orderBy('f.id', 'ASC')
-    //            ->setMaxResults(10)
-    //            ->getQuery()
-    //            ->getResult()
-    //        ;
-    //    }
-
-    //    public function findOneBySomeField($value): ?FeedPost
-    //    {
-    //        return $this->createQueryBuilder('f')
-    //            ->andWhere('f.exampleField = :val')
-    //            ->setParameter('val', $value)
-    //            ->getQuery()
-    //            ->getOneOrNullResult()
-    //        ;
-    //    }
+    /**
+     * @return FeedPost[]
+     */
+    public function getFeedForUser(User $user, int $limit, int $offset): array
+    {
+        return $this->createQueryBuilder('fp')
+            ->innerJoin(Follow::class, 'f', Join::WITH, 'fp.user = f.following')
+            ->where('f.follower = :user')
+            ->setParameter('user', $user)
+            ->orderBy('fp.createdAt', 'DESC')
+            ->setFirstResult($offset)
+            ->setMaxResults($limit)
+            ->getQuery()
+            ->getResult();
+    }
 }
