@@ -39,3 +39,8 @@ Query:
           limit: "Int"
           offset: "Int"
         resolve: '@=query("App\\GraphQL\\Resolver\\BookResolver::searchBooks", args)'
+      feed:
+        type: "[FeedPost]!"
+        args:
+          offset: "Int"
+        resolve: '@=query("App\\GraphQL\\Resolver\\FeedResolver::resolveFeed", args)'

@@ -1,0 +1,18 @@
+FeedPost:
+  type: object
+  config:
+    fields:
+      id: "Int!"
+      user: "User!"
+      log: "ReadLog"
+      text: "String"
+      type: "FeedPostTypeEnum!"
+      createdAt: "DateTimeImmutable!"
+
+FeedPostTypeEnum:
+  type: enum
+  config:
+    values:
+      REVIEW: "review"
+      FINISHED: "finished"
+      TEXT: "text"

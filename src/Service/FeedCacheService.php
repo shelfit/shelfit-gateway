@@ -30,6 +30,14 @@ readonly class FeedCacheService
         }
     }
 
+    /**
+     * @return int[]
+     */
+    public function getFeedForUser(int $userId, int $limit, int $offset): array
+    {
+        return $this->redis->zRevRange(self::cacheKey($userId), $offset, $offset + $limit - 1);
+    }
+
     private static function cacheKey(int $userId): string
     {
         return "feed:$userId";

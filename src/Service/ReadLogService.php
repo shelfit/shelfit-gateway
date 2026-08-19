@@ -21,11 +21,11 @@ use Symfony\Component\Validator\Validator\ValidatorInterface;
 readonly class ReadLogService
 {
     public function __construct(
-        private EntityManagerInterface $entityManager,
-        private MessageBusInterface $bus,
-        private ValidatorInterface $validator,
+        private EntityManagerInterface      $entityManager,
+        private MessageBusInterface         $bus,
+        private ValidatorInterface          $validator,
         private ReadLogPageUpdateRepository $readLogPageUpdateRepository,
-        private FeedPostService $feedPostService,
+        private FeedService                 $feedPostService,
     ) {
     }
 
@@ -87,6 +87,8 @@ readonly class ReadLogService
             $readLog
                 ->setStatus(ReadLogStatus::STATUS_FINISHED)
                 ->setFinishedAt(new DateTimeImmutable());
+
+            $this->feedPostService->createPostFromReadLog($readLog, $readLog->getUser(), FeedPostType::TYPE_FINISHED);
         }
 
         $this->entityManager->persist($readLogPageUpdate);

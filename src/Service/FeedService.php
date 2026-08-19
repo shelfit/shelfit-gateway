@@ -6,15 +6,20 @@ use App\Entity\FeedPost;
 use App\Entity\ReadLog;
 use App\Entity\User;
 use App\Message\CacheFeedPostMessage;
+use App\Repository\FeedPostRepository;
 use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Messenger\MessageBusInterface;
 
-readonly class FeedPostService
+readonly class FeedService
 {
+    private const FEED_PAGE_LIMIT = 50;
+
     public function __construct(
         private EntityManagerInterface $entityManager,
         private MessageBusInterface $bus,
+        private FeedCacheService $feedCacheService,
+        private FeedPostRepository $feedPostRepository,
     ) {
     }
 
@@ -31,5 +36,16 @@ readonly class FeedPostService
 
         $this->bus->dispatch(new CacheFeedPostMessage($feedPost->getId()));
         return $feedPost;
+    }
+
+    /**
+     * @return FeedPost[]
+     */
+    public function getFeed(User $user, int $offset): array
+    {
+        $ids = $this->feedCacheService->getFeedForUser($user->getId(), self::FEED_PAGE_LIMIT, $offset);
+        $posts = $this->feedPostRepository->findBy(['id' => $ids]);
+        usort($posts, static fn($a, $b) => $b->getCreatedAt() <=> $a->getCreatedAt());
+        return $posts;
     }
 }
