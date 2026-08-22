@@ -8,6 +8,15 @@ FeedPost:
       text: "String"
       type: "FeedPostTypeEnum!"
       createdAt: "DateTimeImmutable!"
+      likeCount:
+        type: "Int!"
+        resolve: '@=query("App\\GraphQL\\Resolver\\FeedResolver::resolvePostLikeCount", value)'
+      likes:
+        type: "[FeedPostLike]!"
+        args:
+          limit: "Int"
+          offset: "Int"
+        resolve: '@=query("App\\GraphQL\\Resolver\\FeedResolver::resolvePostLikes", args, value)'
 
 FeedPostTypeEnum:
   type: enum
@@ -16,3 +25,10 @@ FeedPostTypeEnum:
       REVIEW: "review"
       FINISHED: "finished"
       TEXT: "text"
+
+FeedPostLike:
+  type: object
+  config:
+    fields:
+      id: "Int!"
+      user: "User!"

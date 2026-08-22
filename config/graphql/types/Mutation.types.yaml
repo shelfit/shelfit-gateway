@@ -39,3 +39,13 @@ Mutation:
         args:
           updateReadLogInput: "UpdateReadLogInput!"
         resolve: '@=mutation("App\\GraphQL\\Mutation\\ReadLogMutation::updateReadLog", args)'
+      likePost:
+        type: "FeedPostLike"
+        args:
+          feedPostId: "Int!"
+        resolve: '@=mutation("App\\GraphQL\\Mutation\\FeedPostMutation::likePost", args)'
+      unlikePost:
+        type: "Boolean!"
+        args:
+          feedPostLikeId: "Int!"
+        resolve: '@=mutation("App\\GraphQL\\Mutation\\FeedPostMutation::unlikePost", args)'

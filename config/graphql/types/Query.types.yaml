@@ -44,3 +44,8 @@ Query:
         args:
           offset: "Int"
         resolve: '@=query("App\\GraphQL\\Resolver\\FeedResolver::resolveFeed", args)'
+      feedPost:
+        type: "FeedPost!"
+        args:
+          feedPostId: "Int!"
+        resolve: '@=query("App\\GraphQL\\Resolver\\FeedResolver::resolveFeedPost", args)'

@@ -3,6 +3,7 @@
 namespace App\Service;
 
 use App\Entity\FeedPost;
+use App\Entity\FeedPostLike;
 use App\Entity\ReadLog;
 use App\Entity\User;
 use App\Message\CacheFeedPostMessage;
@@ -79,5 +80,17 @@ readonly class FeedService
         }
 
         return array_slice($feed, $offset, self::FEED_PAGE_LIMIT);
+    }
+
+    public function likeFeedPost(FeedPost $feedPost, User $user): FeedPostLike
+    {
+        $like = (new FeedPostLike())
+            ->setFeedPost($feedPost)
+            ->setUser($user)
+            ->setCreatedAt(new DateTimeImmutable());
+
+        $this->entityManager->persist($like);
+        $this->entityManager->flush();
+        return $like;
     }
 }
