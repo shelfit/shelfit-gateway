@@ -42,16 +42,18 @@ readonly class ReadLogResolver implements QueryInterface
     public function userReadLogs(Argument $args, User $value): array
     {
         $paginationSortDto = self::paginationSortDtoFromArgs($args, 'updatedAt');
-        $statuses = array_intersect(
+        $requestedStatuses = array_intersect(
             ReadLogStatus::ALL_STATUSES,
             ($args->offsetGet('statuses') ?? ReadLogStatus::ALL_STATUSES)
         );
 
-        $logs = [];
-        foreach ($statuses as $status) {
-            $logs = array_merge($logs, $this->readLogRepository->getUserReadLogs($value, [$status], $paginationSortDto));
+        $logs = $this->readLogRepository->getUserReadLogs($value, $requestedStatuses, $paginationSortDto);
+
+        $resultsByStatus = array_combine($requestedStatuses, array_fill(0, count($requestedStatuses), []));
+        foreach ($logs as $log) {
+            $resultsByStatus[$log->getStatus()][] = $log;
         }
 
-        return $logs;
+        return array_merge(...array_values($resultsByStatus));
     }
 }

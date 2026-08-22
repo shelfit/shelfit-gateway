@@ -20,7 +20,7 @@ class ReadLogRepository extends ServiceEntityRepository
     }
 
     /**
-     * @param ReadLogStatus[] $statuses
+     * @param string[] $statuses
      * @return ReadLog[]
      */
     public function getUserReadLogs(User $user, array $statuses, PaginationSortDto $paginationSortDto): array

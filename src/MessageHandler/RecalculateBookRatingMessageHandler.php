@@ -26,14 +26,14 @@ readonly class RecalculateBookRatingMessageHandler
         if ($message->getPreviousRating() === null) {
             $sql = "
                 UPDATE books SET
-                    rating = ((coalesce(rating, 0) * coalesce(num_ratings, 0)) + :new_rating) / (coalesce(num_ratings, 0) + 1),
+                    rating = round(((coalesce(rating, 0) * coalesce(num_ratings, 0)) + :new_rating) / (coalesce(num_ratings, 0) + 1), 2),
                     num_ratings = coalesce(num_ratings, 0) + 1
                 WHERE id = :id
             ";
         } else {
             $sql = "
                 UPDATE books SET
-                    rating = ((coalesce(rating, 0) * coalesce(num_ratings, 0) - :prev_rating) + :new_rating) / coalesce(num_ratings, 1)
+                    rating = round(((coalesce(rating, 0) * coalesce(num_ratings, 0) - :prev_rating) + :new_rating) / coalesce(num_ratings, 1), 2)
                 WHERE id = :id
             ";
 
