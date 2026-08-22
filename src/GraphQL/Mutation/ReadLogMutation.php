@@ -102,7 +102,7 @@ readonly class ReadLogMutation implements MutationInterface
             throw new UserError('read.log.not.found');
         }
 
-        if (!$this->authorizationService->authorizeReadLogActions($readLog, $user)) {
+        if (!$this->authorizationService->authorizeResourceOwnership($readLog->getUser()->getId(), $user)) {
             throw new UserError('not.authorized');
         }
 
@@ -129,7 +129,8 @@ readonly class ReadLogMutation implements MutationInterface
             throw new UserError('page.update.not.found');
         }
 
-        if (!$this->authorizationService->authorizeReadLogActions($pageUpdate->getLog(), $user)) {
+        $ownerId = $pageUpdate->getLog()->getUser()->getId();
+        if (!$this->authorizationService->authorizeResourceOwnership($ownerId, $user)) {
             throw new UserError('not.authorized');
         }
 
@@ -150,7 +151,7 @@ readonly class ReadLogMutation implements MutationInterface
             throw new UserError('read.log.not.found');
         }
 
-        if (!$this->authorizationService->authorizeReadLogActions($readLog, $user)) {
+        if (!$this->authorizationService->authorizeResourceOwnership($readLog->getUser()->getId(), $user)) {
             throw new UserError('not.authorized');
         }
 

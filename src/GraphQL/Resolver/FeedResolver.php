@@ -49,7 +49,10 @@ readonly class FeedResolver implements QueryInterface
             throw new UserError(self::NOT_AUTHENTICATED);
         }
 
-        $feedPost = $this->feedPostRepository->find((int)$args->offsetGet('feedPostId'));
+        $feedPost = $this->feedPostRepository->findOneBy([
+            'id' => (int)$args->offsetGet('feedPostId'),
+            'deleted' => false
+        ]);
         if ($feedPost === null) {
             throw new UserError('feed.post.not.found');
         }

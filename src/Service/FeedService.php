@@ -4,9 +4,11 @@ namespace App\Service;
 
 use App\Entity\FeedPost;
 use App\Entity\FeedPostLike;
+use App\Entity\FeedPostType;
 use App\Entity\ReadLog;
 use App\Entity\User;
 use App\Message\CacheFeedPostMessage;
+use App\Message\RemoveFeedPostFromCacheMessage;
 use App\Repository\FeedPostRepository;
 use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
@@ -27,6 +29,17 @@ readonly class FeedService
     ) {
     }
 
+    public function creatTextPost(string $text, User $author): FeedPost
+    {
+        $feedPost = (new FeedPost())
+            ->setUser($author)
+            ->setText($text)
+            ->setType(FeedPostType::TYPE_TEXT)
+            ->setCreatedAt(new DateTimeImmutable());
+
+        return $this->persistPostAndDispatchCacheMessage($feedPost);
+    }
+
     public function createPostFromReadLog(ReadLog $log, User $author, string $type): FeedPost
     {
         $feedPost = (new FeedPost())
@@ -35,11 +48,29 @@ readonly class FeedService
             ->setType($type)
             ->setCreatedAt(new DateTimeImmutable());
 
+        return $this->persistPostAndDispatchCacheMessage($feedPost);
+    }
+
+    private function persistPostAndDispatchCacheMessage(FeedPost $feedPost): FeedPost
+    {
         $this->entityManager->persist($feedPost);
         $this->entityManager->flush();
 
         $this->bus->dispatch(new CacheFeedPostMessage($feedPost->getId()));
         return $feedPost;
+    }
+
+    public function deleteFeedPost(FeedPost $feedPost): bool
+    {
+        $user = $feedPost->getUser();
+
+        $feedPost->setDeleted(true)
+            ->setDeletedAt(new DateTimeImmutable());
+        $this->entityManager->persist($feedPost);
+        $this->entityManager->flush();
+
+        $this->bus->dispatch(new RemoveFeedPostFromCacheMessage($feedPost->getId(), $user->getId()));
+        return true;
     }
 
     /**
@@ -51,7 +82,7 @@ readonly class FeedService
             $ids = $this->feedCacheService->getFeedForUser($user->getId(), self::FEED_PAGE_LIMIT, $offset);
 
             if (!empty($ids)) {
-                $posts = $this->feedPostRepository->findBy(['id' => $ids]);
+                $posts = $this->feedPostRepository->findBy(['id' => $ids, 'deleted' => false]);
                 usort($posts, static fn($a, $b) => $b->getCreatedAt() <=> $a->getCreatedAt());
                 return $posts;
             }

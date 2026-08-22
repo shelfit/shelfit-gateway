@@ -70,6 +70,20 @@ readonly class FeedCacheService
         $tx->exec();
     }
 
+    /**
+     * @param int[] $followerIds
+     */
+    public function removePostFromCache(array $followerIds, int $postId): void
+    {
+        foreach (array_chunk($followerIds, self::BATCH_SIZE) as $followerIdBatch) {
+            $pipe = $this->redis->multi(Redis::PIPELINE);
+            foreach ($followerIdBatch as $followerId) {
+                $pipe->zRem(self::cacheKey($followerId), $postId);
+            }
+            $pipe->exec();
+        }
+    }
+
     private static function cacheKey(int $userId): string
     {
         return "feed:$userId";

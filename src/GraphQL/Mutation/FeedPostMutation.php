@@ -2,7 +2,9 @@
 
 namespace App\GraphQL\Mutation;
 
+use App\Entity\FeedPost;
 use App\Entity\FeedPostLike;
+use App\Entity\FeedPostType;
 use App\Repository\FeedPostLikeRepository;
 use App\Repository\FeedPostRepository;
 use App\Security\LoggedInUserAwareTrait;
@@ -30,6 +32,70 @@ readonly class FeedPostMutation implements MutationInterface
     ) {
     }
 
+    public function createTextPost(Argument $args): FeedPost
+    {
+        try {
+            $user = self::getLoggedInUser($this->security);
+        } catch (AuthenticationException) {
+            throw new UserError(self::NOT_AUTHENTICATED);
+        }
+
+        return $this->feedService->creatTextPost($args->offsetGet('text'), $user);
+    }
+
+    public function updateTextPost(Argument $args): FeedPost
+    {
+        try {
+            $user = self::getLoggedInUser($this->security);
+        } catch (AuthenticationException) {
+            throw new UserError(self::NOT_AUTHENTICATED);
+        }
+
+        $post = $this->feedPostRepository->findOneBy([
+            'id' => $args->offsetGet('postId'),
+            'deleted' => false
+        ]);
+        if ($post === null) {
+            throw new UserError('post.not.found');
+        }
+
+        if (!$this->authorizationService->authorizeResourceOwnership($post->getUser()->getId(), $user)) {
+            throw new UserError('not.authorized');
+        }
+
+        if ($post->getType() !== FeedPostType::TYPE_TEXT) {
+            throw new UserError('post.type.not.text');
+        }
+
+        $post->setText($args->offsetGet('text'));
+        $this->entityManager->persist($post);
+        $this->entityManager->flush();
+        return $post;
+    }
+
+    public function deleteFeedPost(Argument $args): bool
+    {
+        try {
+            $user = self::getLoggedInUser($this->security);
+        } catch (AuthenticationException) {
+            throw new UserError(self::NOT_AUTHENTICATED);
+        }
+
+        $post = $this->feedPostRepository->findOneBy([
+            'id' => $args->offsetGet('postId'),
+            'deleted' => false
+        ]);
+        if ($post === null) {
+            throw new UserError('post.not.found');
+        }
+
+        if (!$this->authorizationService->authorizeResourceOwnership($post->getUser()->getId(), $user)) {
+            throw new UserError('not.authorized');
+        }
+
+        return $this->feedService->deleteFeedPost($post);
+    }
+
     public function likePost(Argument $args): ?FeedPostLike
     {
         try {
@@ -38,7 +104,10 @@ readonly class FeedPostMutation implements MutationInterface
             throw new UserError(self::NOT_AUTHENTICATED);
         }
 
-        $feedPost = $this->feedPostRepository->find((int)$args->offsetGet('feedPostId'));
+        $feedPost = $this->feedPostRepository->findOneBy([
+            'id' => $args->offsetGet('feedPostId'),
+            'deleted' => false
+        ]);
         if ($feedPost === null) {
             throw new UserError('feed.post.not.found');
         }
@@ -63,7 +132,7 @@ readonly class FeedPostMutation implements MutationInterface
             throw new UserError('feed.post.like.not.found');
         }
 
-        if (!$this->authorizationService->authorizeUnlikeFeedPost($like, $user)) {
+        if (!$this->authorizationService->authorizeResourceOwnership($like->getUser()->getId(), $user)) {
             throw new UserError('not.authorized');
         }
 

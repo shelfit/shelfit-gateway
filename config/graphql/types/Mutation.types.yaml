@@ -39,6 +39,22 @@ Mutation:
         args:
           updateReadLogInput: "UpdateReadLogInput!"
         resolve: '@=mutation("App\\GraphQL\\Mutation\\ReadLogMutation::updateReadLog", args)'
+      createTextPost:
+        type: "FeedPost!"
+        args:
+          text: "String!"
+        resolve: '@=mutation("App\\GraphQL\\Mutation\\FeedPostMutation::createTextPost", args)'
+      updateTextPost:
+        type: "FeedPost!"
+        args:
+          postId: "Int!"
+          text: "String!"
+        resolve: '@=mutation("App\\GraphQL\\Mutation\\FeedPostMutation::updateTextPost", args)'
+      deleteFeedPost:
+        type: "Boolean!"
+        args:
+          postId: "Int!"
+        resolve: '@=mutation("App\\GraphQL\\Mutation\\FeedPostMutation::deleteFeedPost", args)'
       likePost:
         type: "FeedPostLike"
         args:

@@ -27,6 +27,7 @@ class FeedPostRepository extends ServiceEntityRepository
         return $this->createQueryBuilder('fp')
             ->innerJoin(Follow::class, 'f', Join::WITH, 'fp.user = f.following')
             ->where('f.follower = :user')
+            ->andWhere('fp.deleted = 0')
             ->setParameter('user', $user)
             ->orderBy('fp.createdAt', 'DESC')
             ->setFirstResult($offset)

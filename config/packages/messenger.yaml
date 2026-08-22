@@ -18,3 +18,4 @@ framework:
             'App\Message\SendEmailMessage': mailer_dispatch
             'App\Message\RecalculateBookRatingMessage': util
             'App\Message\CacheFeedPostMessage': util
+            'App\Message\RemoveFeedPostFromCacheMessage': util
