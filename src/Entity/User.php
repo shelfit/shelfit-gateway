@@ -45,6 +45,9 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\OneToMany(targetEntity: AccountActivationToken::class, mappedBy: 'userId', orphanRemoval: true)]
     private Collection $accountActivationTokens;
 
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $profilePictureKey = null;
+
     public function __construct()
     {
         $this->accountActivationTokens = new ArrayCollection();
@@ -181,6 +184,18 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
                 $accountActivationToken->setUserId(null);
             }
         }
+
+        return $this;
+    }
+
+    public function getProfilePictureKey(): ?string
+    {
+        return $this->profilePictureKey;
+    }
+
+    public function setProfilePictureKey(?string $profilePictureKey): static
+    {
+        $this->profilePictureKey = $profilePictureKey;
 
         return $this;
     }
