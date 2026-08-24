@@ -65,3 +65,24 @@ Mutation:
         args:
           feedPostLikeId: "Int!"
         resolve: '@=mutation("App\\GraphQL\\Mutation\\FeedPostMutation::unlikePost", args)'
+      createComment:
+        type: "Comment!"
+        args:
+          createCommentInput: "CreateCommentInput!"
+        resolve: '@=mutation("App\\GraphQL\\Mutation\\CommentMutation::createComment", args)'
+      editComment:
+        type: "Comment!"
+        args:
+          commentId: "Int!"
+          text: "String!"
+        resolve: '@=mutation("App\\GraphQL\\Mutation\\CommentMutation::editComment", args)'
+      likeComment:
+        type: "Comment!"
+        args:
+          commentId: "Int!"
+        resolve: '@=mutation("App\\GraphQL\\Mutation\\CommentMutation::likeComment", args)'
+      unlikeComment:
+        type: "Comment!"
+        args:
+          commentId: "Int!"
+        resolve: '@=mutation("App\\GraphQL\\Mutation\\CommentMutation::unlikeComment", args)'

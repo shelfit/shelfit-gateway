@@ -1,0 +1,20 @@
+Comment:
+  type: object
+  config:
+    fields:
+      id: "Int!"
+      user: "User!"
+      text: "String!"
+      depth: "Int!"
+      numLikes: "Int!"
+      numReplies: "Int!"
+      parentId: "Int"
+      createdAt: "DateTimeImmutable!"
+
+CreateCommentInput:
+  type: input-object
+  config:
+    fields:
+      text: "String!"
+      postId: "Int!"
+      parentId: "Int"

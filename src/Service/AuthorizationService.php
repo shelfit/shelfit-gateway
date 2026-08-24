@@ -6,8 +6,8 @@ use App\Entity\User;
 
 readonly class AuthorizationService
 {
-    public function authorizeResourceOwnership(int $resourceId, User $user): bool
+    public function authorizeResourceOwnership(int $resourceOwnerId, User $user): bool
     {
-        return $resourceId === $user->getId();
+        return $resourceOwnerId === $user->getId();
     }
 }
