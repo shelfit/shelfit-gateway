@@ -5,6 +5,9 @@ User:
       id: "Int!"
       email: "String!"
       username: "String!"
+      profilePicture:
+        type: "String!"
+        resolve: '@=query("App\\GraphQL\\Resolver\\UserResolver::resolveProfilePicture", value)'
       followers:
         type: "FollowList!"
         args:

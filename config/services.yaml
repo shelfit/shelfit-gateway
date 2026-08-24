@@ -50,6 +50,12 @@ services:
         $profilePicturesBucket: '%env(S3_PROFILE_PICTURES_BUCKET)%'
         $s3WebServeBaseUri: '%env(S3_WEB_SERVE_BASE_URI)%'
 
+    App\Service\FileStorageService:
+      arguments:
+        $profilePicturesBucket: '%env(S3_PROFILE_PICTURES_BUCKET)%'
+        $s3WebServeBaseUri: '%env(S3_WEB_SERVE_BASE_URI)%'
+        $defaultProfilePictureUrl: '%env(DEFAULT_PROFILE_PICTURE_URL)%'
+
     App\Service\RegistrationService:
       arguments:
         $frontendBaseUri: '%env(FRONTEND_BASE_URI)%'

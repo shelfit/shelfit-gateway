@@ -6,6 +6,7 @@ use App\Entity\User;
 use App\GraphQL\Util\PaginatedResolverTrait;
 use App\Repository\UserRepository;
 use App\Security\LoggedInUserAwareTrait;
+use App\Service\FileStorageService;
 use Overblog\GraphQLBundle\Definition\Argument;
 use Overblog\GraphQLBundle\Definition\Resolver\QueryInterface;
 use Overblog\GraphQLBundle\Error\UserError;
@@ -19,6 +20,7 @@ readonly class UserResolver implements QueryInterface
     public function __construct(
         private UserRepository $userRepository,
         private Security $security,
+        private FileStorageService $fileStorageService,
     ) {
     }
 
@@ -50,5 +52,10 @@ readonly class UserResolver implements QueryInterface
         $query = $args->offsetGet('query');
         $paginationSortDto = self::paginationSortDtoFromArgs($args, 'createdAt');
         return $this->userRepository->searchUsers($query, $paginationSortDto);
+    }
+
+    public function resolveProfilePicture(User $value): string
+    {
+        return $this->fileStorageService->resolveUserProfilePictureUrl($value);
     }
 }

@@ -5,7 +5,6 @@ namespace App\Service;
 use App\DTO\FileUploadDto;
 use App\Entity\User;
 use App\Exception\FileUploadValidationException;
-use App\Exception\UserInputValidationException;
 use Aws\S3\Exception\S3Exception;
 use Aws\S3\S3Client;
 use Symfony\Component\Uid\Factory\UlidFactory;
@@ -20,6 +19,7 @@ readonly class FileUploadService
         private S3Client $publicS3Client,
         private S3Client $s3Client,
         private UlidFactory $ulidFactory,
+        private FileStorageService $fileStorageService,
     ) {
     }
 
@@ -75,18 +75,10 @@ readonly class FileUploadService
             $objMeta['ContentLength'] > FileUploadConstraintProvider::FILE_SIZE_LIMIT ||
             !in_array($objMeta['ContentType'], FileUploadConstraintProvider::ALLOWED_CONTENT_TYPES, true)
         ) {
-            $this->deleteFile($key);
+            $this->fileStorageService->deleteFile($key);
             throw new FileUploadValidationException("Invalid file size or format");
         }
 
         return $this->s3WebServeBaseUri . '/' . $key;
-    }
-
-    public function deleteFile(string $key): void
-    {
-        $this->s3Client->deleteObject([
-            'Bucket' => $this->profilePicturesBucket,
-            'Key' => $key,
-        ]);
     }
 }
