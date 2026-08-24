@@ -3,9 +3,6 @@
 namespace App\GraphQL\Resolver;
 
 use App\Entity\FeedPost;
-use App\Entity\FeedPostLike;
-use App\GraphQL\Util\PaginatedResolverTrait;
-use App\Repository\FeedPostLikeRepository;
 use App\Repository\FeedPostRepository;
 use App\Security\LoggedInUserAwareTrait;
 use App\Service\FeedService;
@@ -17,13 +14,12 @@ use Symfony\Component\Security\Core\Exception\AuthenticationException;
 
 readonly class FeedResolver implements QueryInterface
 {
-    use LoggedInUserAwareTrait, PaginatedResolverTrait;
+    use LoggedInUserAwareTrait;
 
     public function __construct(
         private Security    $security,
         private FeedService $feedPostService,
         private FeedPostRepository $feedPostRepository,
-        private FeedPostLikeRepository $feedPostLikeRepository,
     ) {
     }
 
@@ -58,19 +54,5 @@ readonly class FeedResolver implements QueryInterface
         }
 
         return $feedPost;
-    }
-
-    public function resolvePostLikeCount(FeedPost $value): int
-    {
-        return $this->feedPostLikeRepository->getFeedPostLikeCount($value);
-    }
-
-    /**
-     * @return FeedPostLike[]
-     */
-    public function resolvePostLikes(Argument $args, FeedPost $feedPost): array
-    {
-        $paginationSortDto = self::paginationSortDtoFromArgs($args, 'createdAt', 'desc');
-        return $this->feedPostLikeRepository->getFeedPostLikes($feedPost, $paginationSortDto);
     }
 }

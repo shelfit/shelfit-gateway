@@ -49,3 +49,10 @@ Query:
         args:
           feedPostId: "Int!"
         resolve: '@=query("App\\GraphQL\\Resolver\\FeedResolver::resolveFeedPost", args)'
+      commentReplies:
+        type: "[Comment]!"
+        args:
+          commentId: "Int!"
+          limit: "Int"
+          offset: "Int"
+        resolve: '@=query("App\\GraphQL\\Resolver\\CommentResolver::resolveCommentReplies", args)'

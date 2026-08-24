@@ -7,7 +7,7 @@ use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: CommentRepository::class)]
-#[ORM\Index(name: 'IDX_COMMENT_POST_PATH', columns: ['feed_post_id', 'path'])]
+#[ORM\Index(name: 'IDX_PATH', columns: ['path'])]
 class Comment
 {
     #[ORM\Id]

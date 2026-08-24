@@ -10,13 +10,19 @@ FeedPost:
       createdAt: "DateTimeImmutable!"
       likeCount:
         type: "Int!"
-        resolve: '@=query("App\\GraphQL\\Resolver\\FeedResolver::resolvePostLikeCount", value)'
+        resolve: '@=query("App\\GraphQL\\Resolver\\FeedPostLikeResolver::resolvePostLikeCount", value)'
       likes:
         type: "[FeedPostLike]!"
         args:
           limit: "Int"
           offset: "Int"
-        resolve: '@=query("App\\GraphQL\\Resolver\\FeedResolver::resolvePostLikes", args, value)'
+        resolve: '@=query("App\\GraphQL\\Resolver\\FeedPostLikeResolver::resolvePostLikes", args, value)'
+      comments:
+        type: "[CommentThread]!"
+        args:
+          limit: "Int"
+          offset: "Int"
+        resolve: '@=query("App\\GraphQL\\Resolver\\CommentResolver::resolvePostComments", args, value)'
 
 FeedPostTypeEnum:
   type: enum

@@ -11,6 +11,14 @@ Comment:
       parentId: "Int"
       createdAt: "DateTimeImmutable!"
 
+CommentThread:
+  type: object
+  config:
+    fields:
+      root: "Comment!"
+      replies: "[Comment]!"
+      hasMoreReplies: "Boolean!"
+
 CreateCommentInput:
   type: input-object
   config:
