@@ -92,6 +92,12 @@ readonly class BookService
                 array_slice($recommenderBooks, 0, $limitSplit)
             );
         }
-        return array_slice($booksMerged, 0, $paginationSortDto->getLimit());
+
+        $booksById = [];
+        foreach ($booksMerged as $book) {
+            $booksById[$book->getId()] = $book;
+        }
+
+        return array_slice(array_values($booksById), 0, $paginationSortDto->getLimit());
     }
 }
