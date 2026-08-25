@@ -23,7 +23,7 @@ Query:
           id: "Int!"
         resolve: '@=query("App\\GraphQL\\Resolver\\UserResolver::user", args)'
       me:
-        type: "User!"
+        type: "Me!"
         resolve: '@=query("App\\GraphQL\\Resolver\\UserResolver::me", args)'
       searchUsers:
         type: "[User]!"

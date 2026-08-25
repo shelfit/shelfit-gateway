@@ -112,6 +112,11 @@ readonly class FeedPostMutation implements MutationInterface
             throw new UserError('feed.post.not.found');
         }
 
+        $like = $this->feedPostLikeRepository->findOneBy(['user' => $user, 'feedPost' => $feedPost]);
+        if ($like !== null) {
+            return $like;
+        }
+
         try {
             return $this->feedService->likeFeedPost($feedPost, $user);
         } catch (UniqueConstraintViolationException) {

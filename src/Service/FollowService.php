@@ -27,6 +27,10 @@ readonly class FollowService
             return false;
         }
 
+        if ($this->followRepository->getFollowPair($follower->getId(), $followedUser->getId()) !== null) {
+            return false;
+        }
+
         $follow = (new Follow())
             ->setFollower($follower)
             ->setFollowing($followedUser)

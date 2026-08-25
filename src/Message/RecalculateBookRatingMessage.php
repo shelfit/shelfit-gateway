@@ -6,8 +6,8 @@ class RecalculateBookRatingMessage
 {
     public function __construct(
         private int $bookId,
-        private int $newRating,
-        private ?int $previousRating = null,
+        private float $newRating,
+        private ?float $previousRating = null,
     ) {
     }
 
@@ -22,23 +22,23 @@ class RecalculateBookRatingMessage
         return $this;
     }
 
-    public function getNewRating(): int
+    public function getNewRating(): float
     {
         return $this->newRating;
     }
 
-    public function setNewRating(int $newRating): self
+    public function setNewRating(float $newRating): self
     {
         $this->newRating = $newRating;
         return $this;
     }
 
-    public function getPreviousRating(): ?int
+    public function getPreviousRating(): ?float
     {
         return $this->previousRating;
     }
 
-    public function setPreviousRating(?int $previousRating): self
+    public function setPreviousRating(?float $previousRating): self
     {
         $this->previousRating = $previousRating;
         return $this;

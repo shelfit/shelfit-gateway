@@ -28,3 +28,10 @@ User:
           sortField: "ReadLogSortableFieldsEnum"
           sortDirection: "SortDirectionEnum"
         resolve: '@=query("App\\GraphQL\\Resolver\\ReadLogResolver::userReadLogs", args, value)'
+
+Me:
+  type: object
+  inherits: [User]
+  config:
+    fields:
+      email: "String!"

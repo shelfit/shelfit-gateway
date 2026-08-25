@@ -8,7 +8,9 @@ Comment:
       depth: "Int!"
       numLikes: "Int!"
       numReplies: "Int!"
-      parentId: "Int"
+      parentId:
+        type: "Int"
+        resolve: '@=query("App\\GraphQL\\Resolver\\CommentResolver::resolveParentId", value)'
       createdAt: "DateTimeImmutable!"
 
 CommentThread:

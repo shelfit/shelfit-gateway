@@ -3,6 +3,7 @@
 namespace App\GraphQL\Resolver;
 
 use App\Entity\FeedPost;
+use App\GraphQL\Util\PaginatedResolverTrait;
 use App\Repository\FeedPostRepository;
 use App\Security\LoggedInUserAwareTrait;
 use App\Service\FeedService;
@@ -14,7 +15,7 @@ use Symfony\Component\Security\Core\Exception\AuthenticationException;
 
 readonly class FeedResolver implements QueryInterface
 {
-    use LoggedInUserAwareTrait;
+    use LoggedInUserAwareTrait, PaginatedResolverTrait;
 
     public function __construct(
         private Security    $security,
@@ -34,7 +35,8 @@ readonly class FeedResolver implements QueryInterface
             throw new UserError(self::NOT_AUTHENTICATED);
         }
 
-        return $this->feedPostService->getFeed($user, $args->offsetGet('offset') ?? 0);
+        $paginationSortDto = self::paginationSortDtoFromArgs($args, 'createdAt');
+        return $this->feedPostService->getFeed($user, $paginationSortDto->getOffset());
     }
 
     public function resolveFeedPost(Argument $args): FeedPost

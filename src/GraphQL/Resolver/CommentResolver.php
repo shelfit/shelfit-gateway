@@ -45,4 +45,9 @@ readonly class CommentResolver implements QueryInterface
 
         return $this->commentService->getRepliesToComment($comment, $paginationSortDto);
     }
+
+    public function resolveParentId(Comment $value): ?int
+    {
+        return $value->getParent()?->getId();
+    }
 }

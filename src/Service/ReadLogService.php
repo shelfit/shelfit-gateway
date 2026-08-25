@@ -58,6 +58,14 @@ readonly class ReadLogService
 
     public function createReadLog(ReadLogDto $readLogDto): ReadLog
     {
+        $readLog = $this->readLogRepository->findOneBy([
+            'user' => $readLogDto->getUser(),
+            'book' => $readLogDto->getBook()
+        ]);
+        if ($readLog !== null) {
+            return $readLog;
+        }
+
         $currentPage = self::parseInputPage(
             $readLogDto->getCurrentPage(),
             $readLogDto->getBook()->getPageCount()
@@ -216,7 +224,8 @@ readonly class ReadLogService
             (
                 ($updateDto->getRating() !== null && $previousRating === null) ||
                 ($updateDto->getReview() !== null && $previousReview === null)
-            )
+            ) &&
+            !$this->feedPostService->reviewFeedPostAlreadyExists($readLog->getUser(), $readLog)
         ) {
             $feedPost = $this->feedPostService->createPostFromReadLog($readLog, $readLog->getUser(), FeedPostType::TYPE_REVIEW);
             $this->bus->dispatch(new CacheFeedPostMessage($feedPost->getId()));

@@ -45,6 +45,15 @@ readonly class FeedService
         return $feedPost;
     }
 
+    public function reviewFeedPostAlreadyExists(User $author, ReadLog $readLog): bool
+    {
+        return $this->feedPostRepository->findOneBy([
+            'user' => $author,
+            'log' => $readLog,
+            'type' => FeedPostType::TYPE_REVIEW
+        ]) !== null;
+    }
+
     public function createPostFromReadLog(ReadLog $log, User $author, string $type): FeedPost
     {
         $feedPost = (new FeedPost())

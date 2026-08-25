@@ -40,7 +40,7 @@ readonly class CommentMutation implements MutationInterface
         $input = $args->offsetGet('createCommentInput');
 
         $post = $this->feedPostRepository->find($input['postId']);
-        if ($post === null) {
+        if ($post === null || $post->isDeleted() === true) {
             throw new UserError('no.post');
         }
 
@@ -49,6 +49,10 @@ readonly class CommentMutation implements MutationInterface
             $parent = $this->commentRepository->find($input['parentId']);
             if ($parent === null) {
                 throw new UserError('no.parent.comment');
+            }
+
+            if ($parent->getFeedPost()->getId() !== $post->getId()) {
+                throw new UserError('parent.belongs.to.other.post');
             }
         }
 
