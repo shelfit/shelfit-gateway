@@ -29,15 +29,20 @@ readonly class FeedService
     ) {
     }
 
-    public function creatTextPost(string $text, User $author): FeedPost
+    public function createTextPost(string $text, User $author): FeedPost
     {
         $feedPost = (new FeedPost())
             ->setUser($author)
             ->setText($text)
             ->setType(FeedPostType::TYPE_TEXT)
+            ->setDeleted(false)
             ->setCreatedAt(new DateTimeImmutable());
 
-        return $this->persistPostAndDispatchCacheMessage($feedPost);
+        $this->entityManager->persist($feedPost);
+        $this->entityManager->flush();
+
+        $this->bus->dispatch(new CacheFeedPostMessage($feedPost->getId()));
+        return $feedPost;
     }
 
     public function createPostFromReadLog(ReadLog $log, User $author, string $type): FeedPost
@@ -46,17 +51,11 @@ readonly class FeedService
             ->setLog($log)
             ->setUser($author)
             ->setType($type)
+            ->setDeleted(false)
             ->setCreatedAt(new DateTimeImmutable());
 
-        return $this->persistPostAndDispatchCacheMessage($feedPost);
-    }
-
-    private function persistPostAndDispatchCacheMessage(FeedPost $feedPost): FeedPost
-    {
         $this->entityManager->persist($feedPost);
         $this->entityManager->flush();
-
-        $this->bus->dispatch(new CacheFeedPostMessage($feedPost->getId()));
         return $feedPost;
     }
 

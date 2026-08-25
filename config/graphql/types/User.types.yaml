@@ -3,7 +3,6 @@ User:
   config:
     fields:
       id: "Int!"
-      email: "String!"
       username: "String!"
       profilePicture:
         type: "String!"

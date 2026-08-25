@@ -4,6 +4,7 @@ namespace App\Repository;
 
 use App\DTO\Common\PaginationSortDto;
 use App\Entity\Book\Book;
+use App\Entity\Book\BookVisibility;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
@@ -32,9 +33,10 @@ class BookRepository extends ServiceEntityRepository
     public function searchBooks(string $search, PaginationSortDto $paginationSortDto): array
     {
         return $this->createQueryBuilder('b')
-            ->where('lower(b.title) LIKE :search')
-            ->orWhere('lower(b.author) LIKE :search')
+            ->where('b.visibility = :visibility')
+            ->andWhere('(lower(b.title) LIKE :search OR lower(b.author) LIKE :search)')
             ->setParameter('search', '%'.strtolower($search).'%')
+            ->setParameter(':visibility', BookVisibility::VISIBILITY_PUBLIC)
             ->setMaxResults($paginationSortDto->getLimit())
             ->setFirstResult($paginationSortDto->getOffset())
             ->orderBy("b.{$paginationSortDto->getSortField()}", $paginationSortDto->getSortDirection())

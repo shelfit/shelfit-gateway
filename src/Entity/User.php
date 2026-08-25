@@ -42,7 +42,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     /**
      * @var Collection<int, AccountActivationToken>
      */
-    #[ORM\OneToMany(targetEntity: AccountActivationToken::class, mappedBy: 'userId', orphanRemoval: true)]
+    #[ORM\OneToMany(targetEntity: AccountActivationToken::class, mappedBy: 'user', orphanRemoval: true)]
     private Collection $accountActivationTokens;
 
     #[ORM\Column(length: 255, nullable: true)]

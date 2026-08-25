@@ -49,7 +49,7 @@ readonly class RegistrationService
             to: $user->getEmail(),
             template: $config[EmailConfigProvider::ACCOUNT_ACTIVATION_EMAIL]['template'],
             variables: [
-                'activation_url' => $this->frontendBaseUri . '/api/account/activate/' . $activationTokenPlain,
+                'activation_url' => $this->frontendBaseUri . '/api/accounts/activate/' . $activationTokenPlain,
             ]
         ));
 

@@ -2,6 +2,7 @@
 
 namespace App\Service;
 
+use App\DTO\Common\PaginationSortDto;
 use App\DTO\ReadLogDto;
 use App\DTO\ReadLogUpdateDto;
 use App\Entity\Book\BookVisibility;
@@ -9,9 +10,12 @@ use App\Entity\FeedPostType;
 use App\Entity\ReadLog;
 use App\Entity\ReadLogPageUpdate;
 use App\Entity\ReadLogStatus;
+use App\Entity\User;
 use App\Exception\UserInputValidationException;
+use App\Message\CacheFeedPostMessage;
 use App\Message\RecalculateBookRatingMessage;
 use App\Repository\ReadLogPageUpdateRepository;
+use App\Repository\ReadLogRepository;
 use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Messenger\Exception\ExceptionInterface;
@@ -26,7 +30,30 @@ readonly class ReadLogService
         private ValidatorInterface          $validator,
         private ReadLogPageUpdateRepository $readLogPageUpdateRepository,
         private FeedService                 $feedPostService,
+        private ReadLogRepository           $readLogRepository,
     ) {
+    }
+
+    /**
+     * @param string[] $statuses
+     * @param string[] $allowedVisibilities
+     * @return ReadLog[]
+     */
+    public function getUserReadLogs(
+        User $user,
+        array $statuses,
+        array $allowedVisibilities,
+        PaginationSortDto $paginationSortDto
+    ): array
+    {
+        $logs = $this->readLogRepository->getUserReadLogs($user, $statuses, $allowedVisibilities, $paginationSortDto);
+
+        $resultsByStatus = array_combine($statuses, array_fill(0, count($statuses), []));
+        foreach ($logs as $log) {
+            $resultsByStatus[$log->getStatus()][] = $log;
+        }
+
+        return array_merge(...array_values($resultsByStatus));
     }
 
     public function createReadLog(ReadLogDto $readLogDto): ReadLog
@@ -66,6 +93,8 @@ readonly class ReadLogService
      */
     public function updateCurrentPage(ReadLog $readLog, int $toPage): ReadLog
     {
+        $feedPost = null;
+
         $book = $readLog->getBook();
         if ($toPage <= $readLog->getCurrentPage() || $toPage > $book->getPageCount()) {
             throw new UserInputValidationException();
@@ -88,7 +117,9 @@ readonly class ReadLogService
                 ->setStatus(ReadLogStatus::STATUS_FINISHED)
                 ->setFinishedAt(new DateTimeImmutable());
 
-            $this->feedPostService->createPostFromReadLog($readLog, $readLog->getUser(), FeedPostType::TYPE_FINISHED);
+            if ($book->getVisibility() === BookVisibility::VISIBILITY_PUBLIC) {
+                $feedPost = $this->feedPostService->createPostFromReadLog($readLog, $readLog->getUser(), FeedPostType::TYPE_FINISHED);
+            }
         }
 
         $this->entityManager->persist($readLogPageUpdate);
@@ -96,6 +127,10 @@ readonly class ReadLogService
         $this->entityManager->flush();
 
         $this->entityManager->commit();
+
+        if ($feedPost !== null) {
+            $this->bus->dispatch(new CacheFeedPostMessage($feedPost->getId()));
+        }
 
         return $readLog;
     }
@@ -183,7 +218,8 @@ readonly class ReadLogService
                 ($updateDto->getReview() !== null && $previousReview === null)
             )
         ) {
-            $this->feedPostService->createPostFromReadLog($readLog, $readLog->getUser(), FeedPostType::TYPE_REVIEW);
+            $feedPost = $this->feedPostService->createPostFromReadLog($readLog, $readLog->getUser(), FeedPostType::TYPE_REVIEW);
+            $this->bus->dispatch(new CacheFeedPostMessage($feedPost->getId()));
         }
 
         return $readLog;

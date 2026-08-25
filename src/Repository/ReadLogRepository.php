@@ -3,6 +3,7 @@
 namespace App\Repository;
 
 use App\DTO\Common\PaginationSortDto;
+use App\Entity\Book\Book;
 use App\Entity\ReadLog;
 use App\Entity\ReadLogStatus;
 use App\Entity\User;
@@ -21,15 +22,24 @@ class ReadLogRepository extends ServiceEntityRepository
 
     /**
      * @param string[] $statuses
+     * @param string[] $allowedVisibilities
      * @return ReadLog[]
      */
-    public function getUserReadLogs(User $user, array $statuses, PaginationSortDto $paginationSortDto): array
+    public function getUserReadLogs(
+        User $user,
+        array $statuses,
+        array $allowedVisibilities,
+        PaginationSortDto $paginationSortDto
+    ): array
     {
         return $this->createQueryBuilder('rl')
+            ->innerJoin('rl.book', 'b')
             ->where('rl.user = :user')
             ->andWhere('rl.status in (:statuses)')
+            ->andWhere('b.visibility in (:allowedVisibilities)')
             ->setParameter('user', $user)
             ->setParameter('statuses', $statuses)
+            ->setParameter('allowedVisibilities', $allowedVisibilities)
             ->setFirstResult($paginationSortDto->getOffset())
             ->setMaxResults($paginationSortDto->getLimit())
             ->orderBy("rl.{$paginationSortDto->getSortField()}", $paginationSortDto->getSortDirection())

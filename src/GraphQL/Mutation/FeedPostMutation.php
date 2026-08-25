@@ -40,7 +40,7 @@ readonly class FeedPostMutation implements MutationInterface
             throw new UserError(self::NOT_AUTHENTICATED);
         }
 
-        return $this->feedService->creatTextPost($args->offsetGet('text'), $user);
+        return $this->feedService->createTextPost($args->offsetGet('text'), $user);
     }
 
     public function updateTextPost(Argument $args): FeedPost

@@ -3,6 +3,7 @@
 namespace App\GraphQL\Resolver;
 
 use App\Entity\Book\Book;
+use App\Entity\Book\BookVisibility;
 use App\GraphQL\Util\PaginatedResolverTrait;
 use App\Repository\BookRepository;
 use App\Service\BookService;
@@ -21,7 +22,7 @@ readonly class BookResolver implements QueryInterface
     public function resolveBook(Argument $args): ?Book
     {
         $id = $args->offsetGet("id");
-        return $this->bookRepository->findOneBy(["id" => $id]);
+        return $this->bookRepository->findOneBy(["id" => $id, "visibility" => BookVisibility::VISIBILITY_PUBLIC]);
     }
 
     /**
