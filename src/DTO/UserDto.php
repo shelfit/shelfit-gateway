@@ -7,6 +7,7 @@ use Symfony\Component\Validator\Constraints as Assert;
 class UserDto
 {
     public const VALIDATION_GROUP_REGISTER = 'register';
+    public const PASSWORD_MIN_LENGTH = 8;
 
     public function __construct(
         #[Assert\NotBlank(
@@ -33,8 +34,8 @@ class UserDto
             groups: [self::VALIDATION_GROUP_REGISTER],
         )]
         #[Assert\Length(
-            min: 8,
-            minMessage: "Password must be at least 8 characters long",
+            min: self::PASSWORD_MIN_LENGTH,
+            minMessage: "Password must be at least " . self::PASSWORD_MIN_LENGTH . " characters long",
             groups: [self::VALIDATION_GROUP_REGISTER],
         )]
         private ?string $password = null,

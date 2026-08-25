@@ -51,6 +51,8 @@ security:
         - { path: ^/api/logout, roles: PUBLIC_ACCESS }
         - { path: ^/api/register, roles: PUBLIC_ACCESS }
         - { path: ^/api/accounts/activate, roles: PUBLIC_ACCESS }
+        - { path: ^/api/accounts/forgot-password, roles: PUBLIC_ACCESS }
+        - { path: ^/api/accounts/reset-password, roles: PUBLIC_ACCESS }
         - { path: ^/api/token/refresh, roles: PUBLIC_ACCESS }
         - { path: ^/api, roles: IS_AUTHENTICATED_FULLY }
 
