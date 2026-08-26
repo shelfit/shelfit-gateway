@@ -20,6 +20,9 @@ User:
           limit: "Int"
           offset: "Int"
         resolve: '@=query("App\\GraphQL\\Resolver\\FollowResolver::following", args, value)'
+      followedByMe:
+        type: "Boolean"
+        resolve: '@=query("App\\GraphQL\\Resolver\\FollowResolver::resolveFollowedByMe", value)'
       readLogs:
         type: "[ReadLog]!"
         args:

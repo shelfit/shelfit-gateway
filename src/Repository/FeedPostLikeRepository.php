@@ -5,6 +5,7 @@ namespace App\Repository;
 use App\DTO\Common\PaginationSortDto;
 use App\Entity\FeedPost;
 use App\Entity\FeedPostLike;
+use App\Entity\User;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
@@ -42,5 +43,16 @@ class FeedPostLikeRepository extends ServiceEntityRepository
             ->orderBy("fpl.{$paginationSortDto->getSortField()}", $paginationSortDto->getSortDirection())
             ->getQuery()
             ->getResult();
+    }
+
+    public function getFeedPostLikeByUser(FeedPost $feedPost, User $user): ?FeedPostLike
+    {
+        return $this->createQueryBuilder('fpl')
+            ->where('fpl.feedPost = :feedPost')
+            ->andWhere('fpl.user = :user')
+            ->setParameter('feedPost', $feedPost)
+            ->setParameter('user', $user)
+            ->getQuery()
+            ->getOneOrNullResult();
     }
 }

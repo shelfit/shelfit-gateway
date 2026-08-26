@@ -63,7 +63,7 @@ Mutation:
       unlikePost:
         type: "Boolean!"
         args:
-          feedPostLikeId: "Int!"
+          feedPostId: "Int!"
         resolve: '@=mutation("App\\GraphQL\\Mutation\\FeedPostMutation::unlikePost", args)'
       createComment:
         type: "Comment!"

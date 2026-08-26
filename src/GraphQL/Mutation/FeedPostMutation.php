@@ -132,9 +132,14 @@ readonly class FeedPostMutation implements MutationInterface
             throw new UserError(self::NOT_AUTHENTICATED);
         }
 
-        $like = $this->feedPostLikeRepository->find((int)$args->offsetGet('feedPostLikeId'));
+        $feedPost = $this->feedPostRepository->find((int)$args->offsetGet('feedPostId'));
+        if ($feedPost === null) {
+            throw new UserError('feed.post.not.found');
+        }
+
+        $like = $this->feedPostLikeRepository->getFeedPostLikeByUser($feedPost, $user);
         if ($like === null) {
-            throw new UserError('feed.post.like.not.found');
+            return false;
         }
 
         if (!$this->authorizationService->authorizeResourceOwnership($like->getUser()->getId(), $user)) {

@@ -17,6 +17,9 @@ FeedPost:
           limit: "Int"
           offset: "Int"
         resolve: '@=query("App\\GraphQL\\Resolver\\FeedPostLikeResolver::resolvePostLikes", args, value)'
+      likedByMe:
+        type: "Boolean"
+        resolve: '@=query("App\\GraphQL\\Resolver\\FeedPostLikeResolver::resolvePostLikedByMe", value)'
       comments:
         type: "[CommentThread]!"
         args:

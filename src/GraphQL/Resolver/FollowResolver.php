@@ -6,15 +6,19 @@ use App\DTO\Common\PaginationSortDto;
 use App\Entity\User;
 use App\GraphQL\Util\PaginatedResolverTrait;
 use App\Repository\FollowRepository;
+use App\Security\LoggedInUserAwareTrait;
 use Overblog\GraphQLBundle\Definition\Argument;
 use Overblog\GraphQLBundle\Definition\Resolver\QueryInterface;
+use Symfony\Bundle\SecurityBundle\Security;
+use Symfony\Component\Security\Core\Exception\AuthenticationException;
 
 readonly class FollowResolver implements QueryInterface
 {
-    use PaginatedResolverTrait;
+    use LoggedInUserAwareTrait, PaginatedResolverTrait;
 
     public function __construct(
         private FollowRepository $followRepository,
+        private Security $security,
     ) {
     }
 
@@ -42,5 +46,16 @@ readonly class FollowResolver implements QueryInterface
             'users' => $this->followRepository->getFollowingByUser($value, $paginationSortDto),
             'count' => $this->followRepository->getFollowingCountByUser($value),
         ];
+    }
+
+    public function resolveFollowedByMe(User $value): ?bool
+    {
+        try {
+            $user = self::getLoggedInUser($this->security);
+        } catch (AuthenticationException) {
+            return null;
+        }
+
+        return $this->followRepository->getFollowPair($user->getId(), $value->getId()) !== null;
     }
 }
