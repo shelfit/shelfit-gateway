@@ -4,6 +4,7 @@ namespace App\GraphQL\Mutation;
 
 use App\DTO\BookDto;
 use App\DTO\ReadLogDto;
+use App\DTO\ReadLogPageUpdateDto;
 use App\DTO\ReadLogUpdateDto;
 use App\Entity\ReadLog;
 use App\Exception\UserInputValidationException;
@@ -106,11 +107,12 @@ readonly class ReadLogMutation implements MutationInterface
             throw new UserError('not.authorized');
         }
 
+        $pageUpdateDto = (new ReadLogPageUpdateDto())
+            ->setToPage($args->offsetGet('pageUpdateInput')['toPage'])
+            ->setPageUpdateDateTime($args->offsetGet('pageUpdateInput')['pageUpdateDateTime']);
+
         try {
-            return $this->readLogService->updateCurrentPage(
-                $readLog,
-                $args->offsetGet('pageUpdateInput')['toPage']
-            );
+            return $this->readLogService->updateCurrentPage($readLog, $pageUpdateDto);
         } catch (UserInputValidationException) {
             throw new UserError('invalid.to.page');
         }

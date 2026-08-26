@@ -4,6 +4,7 @@ namespace App\Service;
 
 use App\DTO\Common\PaginationSortDto;
 use App\DTO\ReadLogDto;
+use App\DTO\ReadLogPageUpdateDto;
 use App\DTO\ReadLogUpdateDto;
 use App\Entity\Book\BookVisibility;
 use App\Entity\FeedPostType;
@@ -99,11 +100,12 @@ readonly class ReadLogService
     /**
      * @throws UserInputValidationException
      */
-    public function updateCurrentPage(ReadLog $readLog, int $toPage): ReadLog
+    public function updateCurrentPage(ReadLog $readLog, ReadLogPageUpdateDto $pageUpdateDto): ReadLog
     {
         $feedPost = null;
 
         $book = $readLog->getBook();
+        $toPage = $pageUpdateDto->getToPage();
         if ($toPage <= $readLog->getCurrentPage() || $toPage > $book->getPageCount()) {
             throw new UserInputValidationException();
         }
@@ -114,7 +116,8 @@ readonly class ReadLogService
             ->setLog($readLog)
             ->setFromPage($readLog->getCurrentPage())
             ->setToPage($toPage)
-            ->setCreatedAt(new DateTimeImmutable());
+            ->setCreatedAt(new DateTimeImmutable())
+            ->setPageUpdateDateTime($pageUpdateDto->getPageUpdateDateTime());
 
         $readLog
             ->setCurrentPage($toPage)

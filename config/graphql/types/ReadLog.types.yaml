@@ -70,6 +70,7 @@ ReadLogPageUpdate:
       fromPage: "Int!"
       toPage: "Int!"
       createdAt: "DateTimeImmutable!"
+      pageUpdateDateTime: "DateTimeImmutable!"
 
 CreateReadLogPageUpdateInput:
   type: input-object
@@ -77,3 +78,4 @@ CreateReadLogPageUpdateInput:
     fields:
       logId: "Int!"
       toPage: "Int!"
+      pageUpdateDateTime: "DateTimeImmutable!"

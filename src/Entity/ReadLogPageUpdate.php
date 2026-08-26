@@ -26,6 +26,9 @@ class ReadLogPageUpdate
     #[ORM\Column]
     private ?\DateTimeImmutable $createdAt = null;
 
+    #[ORM\Column]
+    private ?\DateTimeImmutable $pageUpdateDateTime = null;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -75,6 +78,18 @@ class ReadLogPageUpdate
     public function setCreatedAt(\DateTimeImmutable $createdAt): static
     {
         $this->createdAt = $createdAt;
+
+        return $this;
+    }
+
+    public function getPageUpdateDateTime(): ?\DateTimeImmutable
+    {
+        return $this->pageUpdateDateTime;
+    }
+
+    public function setPageUpdateDateTime(?\DateTimeImmutable $pageUpdateDateTime): static
+    {
+        $this->pageUpdateDateTime = $pageUpdateDateTime;
 
         return $this;
     }
