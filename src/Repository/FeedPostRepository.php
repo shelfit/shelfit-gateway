@@ -2,7 +2,10 @@
 
 namespace App\Repository;
 
+use App\DTO\Common\PaginationSortDto;
+use App\Entity\Book\Book;
 use App\Entity\FeedPost;
+use App\Entity\FeedPostType;
 use App\Entity\Follow;
 use App\Entity\User;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
@@ -32,6 +35,25 @@ class FeedPostRepository extends ServiceEntityRepository
             ->orderBy('fp.createdAt', 'DESC')
             ->setFirstResult($offset)
             ->setMaxResults($limit)
+            ->getQuery()
+            ->getResult();
+    }
+
+    /**
+     * @return FeedPost[]
+     */
+    public function getReviewsForBook(Book $book, PaginationSortDto $paginationSortDto): array
+    {
+        return $this->createQueryBuilder('fp')
+            ->innerJoin('fp.log', 'l')
+            ->andWhere('l.book = :book')
+            ->andWhere('fp.deleted = 0')
+            ->andWhere('fp.type = :type')
+            ->setParameter('book', $book)
+            ->setParameter('type', FeedPostType::TYPE_REVIEW)
+            ->orderBy('fp.'.$paginationSortDto->getSortField(), $paginationSortDto->getSortDirection())
+            ->setMaxResults($paginationSortDto->getLimit())
+            ->setFirstResult($paginationSortDto->getOffset())
             ->getQuery()
             ->getResult();
     }

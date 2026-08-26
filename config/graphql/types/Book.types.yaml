@@ -12,6 +12,12 @@ Book:
       rating: "Float"
       num_ratings: "Int"
       visibility: "BookVisibilityEnum!"
+      reviews:
+        type: "[FeedPost]!"
+        args:
+          limit: "Int"
+          offset: "Int"
+        resolve: '@=query("App\\GraphQL\\Resolver\\BookResolver::resolveBookReviews", args, value)'
 
 BookSourceEnum:
   type: enum

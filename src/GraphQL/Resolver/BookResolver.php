@@ -4,8 +4,10 @@ namespace App\GraphQL\Resolver;
 
 use App\Entity\Book\Book;
 use App\Entity\Book\BookVisibility;
+use App\Entity\FeedPost;
 use App\GraphQL\Util\PaginatedResolverTrait;
 use App\Repository\BookRepository;
+use App\Repository\FeedPostRepository;
 use App\Service\BookService;
 use Overblog\GraphQLBundle\Definition\Argument;
 use Overblog\GraphQLBundle\Definition\Resolver\QueryInterface;
@@ -17,6 +19,7 @@ readonly class BookResolver implements QueryInterface
     public function __construct(
         private BookRepository $bookRepository,
         private BookService $bookService,
+        private FeedPostRepository $feedPostRepository,
     ) {}
 
     public function resolveBook(Argument $args): ?Book
@@ -34,5 +37,14 @@ readonly class BookResolver implements QueryInterface
         $paginationSortDto = self::paginationSortDtoFromArgs($args, 'num_ratings', 'desc');
 
         return $this->bookService->searchBooks($query, $paginationSortDto);
+    }
+
+    /**
+     * @return FeedPost[]
+     */
+    public function resolveBookReviews(Argument $args, Book $value): array
+    {
+        $paginationSortDto = self::paginationSortDtoFromArgs($args, 'createdAt', 'desc');
+        return $this->feedPostRepository->getReviewsForBook($value, $paginationSortDto);
     }
 }
