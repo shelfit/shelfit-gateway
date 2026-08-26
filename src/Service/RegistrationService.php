@@ -26,7 +26,9 @@ readonly class RegistrationService
     {
         $user = (new User())
             ->setUsername($userDto->getUsername())
-            ->setEmail($userDto->getEmail());
+            ->setEmail($userDto->getEmail())
+            ->setBio($userDto->getBio())
+            ->setCreatedAt(new DateTimeImmutable());
         $user->setPassword($this->passwordHasher->hashPassword($user, $userDto->getPassword()));
 
         $activationTokenPlain = bin2hex(random_bytes(16));

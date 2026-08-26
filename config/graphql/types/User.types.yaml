@@ -4,6 +4,7 @@ User:
     fields:
       id: "Int!"
       username: "String!"
+      bio: "String"
       profilePicture:
         type: "String!"
         resolve: '@=query("App\\GraphQL\\Resolver\\UserResolver::resolveProfilePicture", value)'
@@ -28,6 +29,9 @@ User:
           sortField: "ReadLogSortableFieldsEnum"
           sortDirection: "SortDirectionEnum"
         resolve: '@=query("App\\GraphQL\\Resolver\\ReadLogResolver::userReadLogs", args, value)'
+      currentRead:
+        type: "ReadLog"
+        resolve: '@=query("App\\GraphQL\\Resolver\\ReadLogResolver::resolveUserCurrentRead", value)'
 
 Me:
   type: object

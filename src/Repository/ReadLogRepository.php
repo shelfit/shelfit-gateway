@@ -46,4 +46,16 @@ class ReadLogRepository extends ServiceEntityRepository
             ->getQuery()
             ->getResult();
     }
+
+    public function getUserCurrentRead(User $user): ?ReadLog
+    {
+        return $this->createQueryBuilder('rl')
+            ->where('rl.user = :user')
+            ->setParameter('user', $user)
+            ->andWhere("rl.status = 'reading'")
+            ->orderBy('rl.updatedAt', 'DESC')
+            ->setMaxResults(1)
+            ->getQuery()
+            ->getOneOrNullResult();
+    }
 }

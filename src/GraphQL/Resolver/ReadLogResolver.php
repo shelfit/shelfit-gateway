@@ -88,4 +88,9 @@ readonly class ReadLogResolver implements QueryInterface
 
         return $this->readLogService->getUserReadLogs($value, $requestedStatuses, $allowedVisibilities, $paginationSortDto);
     }
+
+    public function resolveUserCurrentRead(User $value): ?ReadLog
+    {
+        return $this->readLogRepository->getUserCurrentRead($value);
+    }
 }

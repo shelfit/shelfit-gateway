@@ -39,6 +39,7 @@ class UserDto
             groups: [self::VALIDATION_GROUP_REGISTER],
         )]
         private ?string $password = null,
+        private ?string $bio = null,
     ) {
     }
 
@@ -72,6 +73,17 @@ class UserDto
     public function setPassword(?string $password): self
     {
         $this->password = $password;
+        return $this;
+    }
+
+    public function getBio(): ?string
+    {
+        return $this->bio;
+    }
+
+    public function setBio(?string $bio): self
+    {
+        $this->bio = $bio;
         return $this;
     }
 }
