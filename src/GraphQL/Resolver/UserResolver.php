@@ -2,8 +2,10 @@
 
 namespace App\GraphQL\Resolver;
 
+use App\Entity\FeedPost;
 use App\Entity\User;
 use App\GraphQL\Util\PaginatedResolverTrait;
+use App\Repository\FeedPostRepository;
 use App\Repository\UserRepository;
 use App\Security\LoggedInUserAwareTrait;
 use App\Service\FileStorageService;
@@ -21,6 +23,7 @@ readonly class UserResolver implements QueryInterface
         private UserRepository $userRepository,
         private Security $security,
         private FileStorageService $fileStorageService,
+        private FeedPostRepository $feedPostRepository,
     ) {
     }
 
@@ -57,5 +60,14 @@ readonly class UserResolver implements QueryInterface
     public function resolveProfilePicture(User $value): string
     {
         return $this->fileStorageService->resolveUserProfilePictureUrl($value);
+    }
+
+    /**
+     * @return FeedPost[]
+     */
+    public function resolveUserPosts(Argument $args, User $value): array
+    {
+        $paginationSortDto = self::paginationSortDtoFromArgs($args, 'createdAt', 'desc');
+        return $this->feedPostRepository->getUserPosts($value, $paginationSortDto);
     }
 }

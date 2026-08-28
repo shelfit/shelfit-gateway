@@ -57,4 +57,20 @@ class FeedPostRepository extends ServiceEntityRepository
             ->getQuery()
             ->getResult();
     }
+
+    /**
+     * @return FeedPost[]
+     */
+    public function getUserPosts(User $user, PaginationSortDto $paginationSortDto): array
+    {
+        return $this->createQueryBuilder('fp')
+            ->where('fp.user = :user')
+            ->andWhere('fp.deleted = 0')
+            ->setParameter('user', $user)
+            ->orderBy('fp.'.$paginationSortDto->getSortField(), $paginationSortDto->getSortDirection())
+            ->setMaxResults($paginationSortDto->getLimit())
+            ->setFirstResult($paginationSortDto->getOffset())
+            ->getQuery()
+            ->getResult();
+    }
 }

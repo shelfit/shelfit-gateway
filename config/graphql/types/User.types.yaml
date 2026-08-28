@@ -35,6 +35,12 @@ User:
       currentRead:
         type: "ReadLog"
         resolve: '@=query("App\\GraphQL\\Resolver\\ReadLogResolver::resolveUserCurrentRead", value)'
+      posts:
+        type: "[FeedPost]!"
+        args:
+          limit: "Int"
+          offset: "Int"
+        resolve: '@=query("App\\GraphQL\\Resolver\\UserResolver::resolveUserPosts", args, value)'
 
 Me:
   type: object
