@@ -22,6 +22,11 @@ readonly class CommentResolver implements QueryInterface
     ) {
     }
 
+    public function resolvePostCommentCount(FeedPost $value): int
+    {
+        return $this->commentRepository->getPostCommentCount($value);
+    }
+
     /**
      * @return CommentThreadDto[]
      */
