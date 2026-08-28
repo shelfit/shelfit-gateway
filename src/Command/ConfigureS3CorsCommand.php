@@ -14,9 +14,9 @@ use Throwable;
 #[AsCommand(name: 'shelfit:configure-cors')]
 readonly class ConfigureS3CorsCommand
 {
-    private const CORS_ALLOWED_METHODS = ['GET', 'PUT', 'HEAD'];
+    private const CORS_ALLOWED_METHODS = ['GET', 'PUT', 'HEAD', 'OPTIONS'];
     private const CORS_ALLOWED_ORIGINS = [
-        'http://localhost:3000',
+        'http://localhost:28029',
     ];
 
     public function __construct(
