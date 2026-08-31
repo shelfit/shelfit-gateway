@@ -48,3 +48,10 @@ Me:
   config:
     fields:
       email: "String!"
+
+EditAccountInput:
+  type: input-object
+  config:
+    fields:
+      username: "String!"
+      bio: "String"

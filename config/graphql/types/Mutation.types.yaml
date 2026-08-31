@@ -86,3 +86,8 @@ Mutation:
         args:
           commentId: "Int!"
         resolve: '@=mutation("App\\GraphQL\\Mutation\\CommentMutation::unlikeComment", args)'
+      editAccount:
+        type: "Me!"
+        args:
+          editAccountInput: "EditAccountInput!"
+        resolve: '@=mutation("App\\GraphQL\\Mutation\\UserMutation::editAccount", args)'
